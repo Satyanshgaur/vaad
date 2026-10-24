@@ -6,6 +6,7 @@ otherwise the dev set would leak test tasks in another language.
     python -m harness.split assign raw/ harness/tasks/   # write dev/ and test/ files
     python -m harness.split lock harness/tasks/          # write SPLITS.lock
     python -m harness.split check harness/tasks/         # fail if anything changed
+    python -m harness.split check harness/tasks/ --allow-missing test/   # CI: test is private
 """
 
 from __future__ import annotations
@@ -70,8 +71,12 @@ def write_lock(tasks_root: Path) -> Path:
     return path
 
 
-def check_lock(tasks_root: Path) -> list[str]:
-    """Return a list of differences between the lock file and the files on disk."""
+def check_lock(tasks_root: Path, allow_missing: str | None = None) -> list[str]:
+    """Return a list of differences between the lock file and the files on disk.
+
+    ``allow_missing`` is a path prefix (e.g. "test/") whose locked files may be absent, as in
+    CI where the private test split is not checked out. Present files are always verified.
+    """
     path = tasks_root / LOCK_NAME
     if not path.exists():
         return [f"{path} missing"]
@@ -80,7 +85,11 @@ def check_lock(tasks_root: Path) -> list[str]:
     problems = [f"{key} changed" for key in ("salt", "dev_fraction") if locked[key] != current[key]]
     lf, cf = locked["files"], current["files"]
     assert isinstance(lf, dict) and isinstance(cf, dict)
-    problems += [f"{name} removed" for name in lf.keys() - cf.keys()]
+    problems += [
+        f"{name} removed"
+        for name in lf.keys() - cf.keys()
+        if not (allow_missing and name.startswith(allow_missing))
+    ]
     problems += [f"{name} added" for name in cf.keys() - lf.keys()]
     problems += [f"{name} modified" for name in lf.keys() & cf.keys() if lf[name] != cf[name]]
     return sorted(problems)
@@ -92,8 +101,10 @@ def main(argv: list[str] | None = None) -> int:
     a = sub.add_parser("assign")
     a.add_argument("src", type=Path)
     a.add_argument("tasks_root", type=Path)
-    for name in ("lock", "check"):
-        sub.add_parser(name).add_argument("tasks_root", type=Path)
+    sub.add_parser("lock").add_argument("tasks_root", type=Path)
+    check = sub.add_parser("check")
+    check.add_argument("tasks_root", type=Path)
+    check.add_argument("--allow-missing", help="path prefix that may be absent, e.g. test/")
     args = parser.parse_args(argv)
 
     if args.cmd == "assign":
@@ -101,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.cmd == "lock":
         print(f"wrote {write_lock(args.tasks_root)}")
     else:
-        problems = check_lock(args.tasks_root)
+        problems = check_lock(args.tasks_root, args.allow_missing)
         for p in problems:
             print(p, file=sys.stderr)
         return 1 if problems else 0

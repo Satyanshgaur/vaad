@@ -18,9 +18,16 @@ htmlcov/
 *.gguf
 models/
 data/raw/
+data/external/
 
 # Runtime traces (release reports under harness/reports/ are committed, their traces are not)
 traces/
 harness/reports/**/traces/
 
 config/vaad.yaml
+
+# Hashed-private test split: test tasks and the sources that contain their text live in the
+# private repo (scripts/private_sync.sh). Only hashes are public (SPLITS.lock, test_ngrams).
+harness/tasks/test/*.jsonl
+harness/sources/
+private/

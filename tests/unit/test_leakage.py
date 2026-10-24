@@ -4,7 +4,14 @@ from pathlib import Path
 
 import pytest
 
-from harness.leakage import DEFAULT_GUARDED, DEFAULT_TEST_DIR, find_leaks, ngrams
+from harness.leakage import (
+    DEFAULT_GUARDED,
+    DEFAULT_HASH_FILE,
+    DEFAULT_TEST_DIR,
+    find_leaks,
+    ngrams,
+    write_hashes,
+)
 from harness.schema import Message
 from tests.unit.test_split import make_task
 
@@ -44,4 +51,19 @@ def test_clean(tmp_path: Path) -> None:
 
 @pytest.mark.unit
 def test_repo_is_clean() -> None:
-    assert find_leaks(DEFAULT_TEST_DIR, DEFAULT_GUARDED) == []
+    assert find_leaks(DEFAULT_TEST_DIR, DEFAULT_GUARDED, hash_file=DEFAULT_HASH_FILE) == []
+
+
+@pytest.mark.unit
+def test_hash_file_detects_overlap_without_test_text(tmp_path: Path) -> None:
+    turn = "mera order kal tak bhej do please do kilo wala"
+    test_dir = write_test_split(tmp_path, turn)
+    hash_file = tmp_path / "hashes.txt"
+    assert write_hashes(test_dir, hash_file) > 0
+    assert turn not in hash_file.read_text()
+
+    (test_dir / "t.jsonl").unlink()  # CI: the private test split is not checked out
+    lexicon = tmp_path / "lex.yaml"
+    lexicon.write_text(f"# copied: {turn}\n")
+    leaks = find_leaks(test_dir, [lexicon], hash_file=hash_file)
+    assert leaks and "task p1-hinglish" in leaks[0]

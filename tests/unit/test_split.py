@@ -64,3 +64,17 @@ def test_lock_detects_changes(tmp_path: Path) -> None:
 @pytest.mark.unit
 def test_missing_lock(tmp_path: Path) -> None:
     assert check_lock(tmp_path)[0].endswith("missing")
+
+
+@pytest.mark.unit
+def test_allow_missing_private_split(tmp_path: Path) -> None:
+    raw = tmp_path / "raw.jsonl"
+    raw.write_text("".join(make_task(f"p{i}").model_dump_json() + "\n" for i in range(20)))
+    root = tmp_path / "tasks"
+    write_split(raw, root)
+    write_lock(root)
+    (root / "test" / "raw.jsonl").unlink()
+    assert check_lock(root) == ["test/raw.jsonl removed"]
+    assert check_lock(root, allow_missing="test/") == []
+    (root / "dev" / "raw.jsonl").write_text("")
+    assert check_lock(root, allow_missing="test/") == ["dev/raw.jsonl modified"]
