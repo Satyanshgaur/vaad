@@ -1,0 +1,9 @@
+# Frozen model files for every reported run. Fill in Week 1; results reference these hashes.
+# - name: qwen2.5-3b-instruct
+#   hf_repo: <org>/<repo>
+#   quants:
+#     Q8_0:   {file: <file>.gguf, sha256: <hash>}
+#     Q4_K_M: {file: <file>.gguf, sha256: <hash>}
+#   chat_template: native   # needs llama-server --jinja
+#   seconds_per_call: null  # timed in Week 1
+models: []
