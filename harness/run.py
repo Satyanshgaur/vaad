@@ -128,10 +128,28 @@ def run_trial(
     start = time.perf_counter()
     response = client.post(f"{condition.base_url}/v1/chat/completions", json=body)
     ms = (time.perf_counter() - start) * 1000
+    if is_unparseable_output(response):
+        # The model emitted malformed tool-call text: a model failure, scored as a wrong,
+        # schema-invalid trial rather than aborting the run.
+        data = response.json()
+        result = score_trial(task, condition, seed, [], False, ms)
+        result = result.model_copy(update={"correct": False, "error": data["error"]["message"]})
+        return result, data
     response.raise_for_status()
     data = response.json()
     calls, parsed_ok = parse_tool_calls(data)
     return score_trial(task, condition, seed, calls, parsed_ok, ms), data
+
+
+def is_unparseable_output(response: httpx.Response) -> bool:
+    """llama-server answers 500 when it cannot parse the model's tool-call output."""
+    if response.status_code != 500:
+        return False
+    try:
+        message = str(response.json()["error"]["message"])
+    except (ValueError, KeyError, TypeError):
+        return False
+    return "does not match the expected" in message or "Failed to parse" in message
 
 
 def run_grid(

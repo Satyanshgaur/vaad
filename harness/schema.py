@@ -70,6 +70,8 @@ class TrialResult(BaseModel):
     # Executed (not flagged) but some value was wrong: the business-critical failure.
     wrong_value: bool = False
     latency_ms: float = 0.0
+    # Set when the backend could not parse the model's output into tool calls.
+    error: str | None = None
 
 
 def load_tasks(path: Path) -> list[Task]:
