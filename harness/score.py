@@ -34,8 +34,12 @@ def values_equal(predicted: Any, expected: Any) -> bool:
 def call_matches(predicted: ToolCall, expected: ExpectedCall) -> bool:
     if predicted.name != expected.name:
         return False
-    if predicted.arguments.keys() - expected.arguments.keys():
+    if predicted.arguments.keys() - expected.arguments.keys() - set(expected.free_text):
         return False  # hallucinated argument
+    for arg in expected.free_text:
+        value = predicted.arguments.get(arg)
+        if not (isinstance(value, str) and value.strip()):
+            return False
     for arg, acceptable in expected.arguments.items():
         if arg not in predicted.arguments:
             if arg in expected.optional:
@@ -51,7 +55,7 @@ def calls_match(predicted: list[ToolCall], expected: list[ExpectedCall]) -> bool
     if len(predicted) != len(expected):
         return False
     if not expected:
-        return True  # relevance task: correctly called nothing
+        return True  # irrelevance or clarify task: correctly called nothing
     if len(expected) > MAX_PERMUTED_CALLS:
         return _greedy_match(predicted, expected)
     return any(

@@ -1,0 +1,38 @@
+{
+  "salt": "vaad-split-v1",
+  "dev_fraction": 0.4,
+  "files": {
+    "dev/bfcl_en.jsonl": {
+      "sha256": "4db0985ae116d44ecdfcf3fc3f48c513b7c80c5455d947dc4164bdda1b2e2137",
+      "tasks": 62
+    },
+    "dev/bfcl_hi.jsonl": {
+      "sha256": "5c4bfd94c756b6989c5d4cc27c7b164e2cd74408d6006d28a6bf7072a3d83ab5",
+      "tasks": 62
+    },
+    "dev/bfcl_hinglish.jsonl": {
+      "sha256": "8ff5a44b1e3efdebefb2dc8ab27aa8b2846bc70324824750e05e34d97dc449c8",
+      "tasks": 18
+    },
+    "dev/value_heavy.jsonl": {
+      "sha256": "01642dbb034e42dfa8182ec2325f292ff4546742b187af3e2c10109903b414ba",
+      "tasks": 69
+    },
+    "test/bfcl_en.jsonl": {
+      "sha256": "9d40d0f835f81cdfaac4a3021ee60dbe6ba57ea1df184f795678ad13a761b6c9",
+      "tasks": 87
+    },
+    "test/bfcl_hi.jsonl": {
+      "sha256": "05d4f7d78bf1722ceee9521ef407b7ea74339a724312b847e6f7a37fe6259ec9",
+      "tasks": 87
+    },
+    "test/bfcl_hinglish.jsonl": {
+      "sha256": "c3774851149777b31b02fbab0e2fc9a73db3fad925f25ee6521d885e9728a79c",
+      "tasks": 32
+    },
+    "test/value_heavy.jsonl": {
+      "sha256": "59a29076a92f36a8567e19dc7dd7aeda9715e353bf83d9f79fb842131a2408b9",
+      "tasks": 81
+    }
+  }
+}

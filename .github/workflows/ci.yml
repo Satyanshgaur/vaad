@@ -36,7 +36,7 @@ jobs:
 
       - name: "Split lock unchanged"
         if: hashFiles('harness/tasks/SPLITS.lock') != ''
-        run: uv run python -m harness.split check harness/tasks
+        run: uv run python -m harness.split check harness/tasks --allow-missing test/
 
   # Gates switched on by later phases:
   #   4 golden canonicalization  -> Phase 2: pytest tests/golden -m golden

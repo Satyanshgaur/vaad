@@ -1,9 +1,31 @@
-# Frozen model files for every reported run. Fill in Week 1; results reference these hashes.
-# - name: qwen2.5-3b-instruct
-#   hf_repo: <org>/<repo>
-#   quants:
-#     Q8_0:   {file: <file>.gguf, sha256: <hash>}
-#     Q4_K_M: {file: <file>.gguf, sha256: <hash>}
-#   chat_template: native   # needs llama-server --jinja
-#   seconds_per_call: null  # timed in Week 1
-models: []
+# Frozen model files for every reported run. Results reference these hashes.
+# Files live outside the repo (default ~/models); download commands are in docs/PLAN.md.
+# Run with llama-server --jinja (scripts/llama_server.sh). Qwen3.5 runs with thinking
+# disabled (chat_template_kwargs.enable_thinking=false; harness flag --no-think).
+llama_cpp_commit: df9beac
+models:
+  - name: qwen3.5-4b
+    hf_repo: unsloth/Qwen3.5-4B-GGUF
+    base_model: Qwen/Qwen3.5-4B
+    license: apache-2.0  # quants may be redistributed
+    role: primary (3-4B)
+    quants:
+      Q8_0: {file: qwen3.5-4b/Qwen3.5-4B-Q8_0.gguf, sha256: 10cc391b403021dd11c614679d2fd92f611c3681d29e29651b717316965d61e1}
+      Q4_K_M: {file: qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf, sha256: 00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4}
+  - name: llama3.2-3b
+    hf_repo: bartowski/Llama-3.2-3B-Instruct-GGUF
+    base_model: meta-llama/Llama-3.2-3B-Instruct
+    license: llama3.2  # redistribution allowed with "Built with Llama" attribution + licence copy
+    role: second family (3B)
+    quants:
+      Q8_0: {file: llama3.2-3b/Llama-3.2-3B-Instruct-Q8_0.gguf, sha256: b5607b5090a8280063fff2d706bb3408ca6542341b06aab39c3eca0a28575921}
+      Q4_K_M: {file: llama3.2-3b/Llama-3.2-3B-Instruct-Q4_K_M.gguf, sha256: 6c1a2b41161032677be168d354123594c0e6e67d2b9227c84f296ad037c728ff}
+  - name: qwen3.5-0.8b
+    hf_repo: unsloth/Qwen3.5-0.8B-GGUF
+    base_model: Qwen/Qwen3.5-0.8B
+    license: apache-2.0
+    role: CI smoke gate (CPU)
+    quants:
+      Q8_0: {file: qwen3.5-0.8b/Qwen3.5-0.8B-Q8_0.gguf, sha256: 0ad885ffd4bb022fc4f0d33a3308fa108ef8613159d3b3a67e23abca056b7a6c}
+# Note: the unsloth/bartowski quants use their own imatrix calibration. Phase 3 builds its own
+# standard- and Indic-calibrated Q4_K_M from the base weights so the comparison is controlled.
