@@ -31,3 +31,4 @@ config/vaad.yaml
 harness/tasks/test/*.jsonl
 harness/sources/
 private/
+harness/reports/**/server.log
