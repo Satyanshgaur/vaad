@@ -12,21 +12,45 @@ never skipped.
 1. Tune lexicons, prompts and router thresholds on the **dev** split only.
 2. Run the **test** split once per release, and never to chase a number.
 3. Run 4 seeds per task per condition at temperature 0.7, plus a temperature-0 pass@1 check.
-4. Report bootstrap 95% intervals. A gain counts only when the intervals do not overlap
-   (`harness.metrics.intervals_overlap`).
+4. Report bootstrap 95% intervals. A gain counts only when the **paired** bootstrap 95%
+   interval of the per-task difference excludes 0 (`harness.metrics.paired_bootstrap_ci`;
+   both conditions run on the same tasks). Decided at G0 in place of the brief's
+   non-overlap rule, which on 41 Hinglish dev tasks would need a gain of about 30 points.
 5. Freeze model file hashes, quant files and prompts in every results file.
 6. The out-of-scope table in the brief is the contract. New ideas go into GitHub issues
    labelled `v2`.
 7. One change per PR, with a conventional-commit title. Use the PR template.
 
-## Launch target (written at G0, then never moved)
+## Launch target (written at G0 on 2026-10-24, then never moved)
 
-| Metric | Baseline (dev) | Target |
+Model: Qwen3.5-4B Q4_K_M. The target is checked **once, on the test split**, at Phase 4.
+"Best baseline" means the better of the raw model and the strong system prompt, per language.
+The test baselines are measured in that same Phase 4 run.
+
+| Metric | Baseline (dev, seeds 0–3) | Target (test) |
 |---|---|---|
-| Hinglish pass^4, 4-bit model, gateway off → on | _TBD Week 1_ | _baseline + ≥10 pts (placeholder)_ |
-| English pass^4 with gateway | _TBD_ | 95% CI overlaps the baseline |
-| Wrong-value execution rate | _TBD_ | below the baseline |
+| Hinglish pass^4, gateway on vs best baseline | raw 0.341, prompt **0.463** | ≥ best baseline **+ 10 pts**, paired 95% CI of the gain > 0 |
+| English pass^4, gateway on vs raw | raw **0.824**, prompt 0.765 | paired 95% CI lower bound of the change ≥ −3 pts |
+| Hinglish wrong-value execution rate | raw **34.8%**, prompt 32.3% | below raw, paired 95% CI of the change < 0 |
 | Added p50 latency, canonicalizer only | n/a | < 20 ms |
+
+### G0 baseline (dev, Qwen3.5-4B Q4_K_M, 4 seeds, temperature 0.7)
+
+| Language (tasks) | pass@1 | pass^4 | Schema-valid | Wrong-value | p50 / p95 latency |
+|---|---|---|---|---|---|
+| English (85) | 0.856 [0.78, 0.92] | 0.824 [0.74, 0.89] | 96.8% | 7.6% | 1.3 s / 3.5 s |
+| Hindi (85) | 0.512 [0.41, 0.61] | 0.447 [0.34, 0.55] | 95.3% | 33.2% | 1.3 s / 8.3 s |
+| Hinglish (41) | 0.463 [0.33, 0.60] | 0.341 [0.20, 0.49] | 95.1% | 34.8% | 1.4 s / 4.6 s |
+
+- **Reproducibility:** re-running seeds 0–3 gives identical numbers (llama-server is
+  deterministic per seed). A fresh run with seeds 4–7 stays inside every interval: pass^4
+  moves by at most 2.4 points, and Hinglish wrong-value by 6.1 points.
+- **Strong prompt:** Hinglish pass^4 +12.2 points (paired CI [+0.0, +26.8]), English −5.9
+  points (paired CI [−11.8, −1.2]: a real loss), Hindi no change. So prompting alone is not a
+  free fix.
+- **The failures are the target problem:** "paanch sau" → ₹50,000, "dedh crore" → 8 crore,
+  "saade nau baje" → 21:00, "parson" → today, and a transfer executed to a 9-digit phone.
+- Reports: `harness/reports/g0-qwen3.5-4b-Q4_K_M/` (`raw-a`, `raw-b`, `raw-seeds4-7`, `prompt`).
 
 Measured seconds per call: **2.69 s mean, 1.81 s p50, 7.3 s p95** (Qwen3.5-4B Q4_K_M, RTX 3050
 6 GB, thinking off, 211 dev tasks, 2026-10-24). With thinking on, a call takes ~7.9 s, so the
@@ -78,9 +102,14 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
       language (flag rate arrives with the gateway)
 
 **Baseline**
-- [ ] Raw model on dev, 4 seeds, run **twice**
-- [ ] Strong-prompt baseline (`harness/prompts/strong_system.txt`)
-- [ ] Fill in the launch target table above
+- [x] Raw model on dev, 4 seeds, run **twice**, plus a seeds 4–7 run (`scripts/baseline_g0.sh`)
+- [x] Strong-prompt baseline (`harness/prompts/strong_system.txt`)
+- [x] Fill in the launch target table above
+- [ ] Same baseline for Llama-3.2-3B and for both Q8_0 quants (C1 needs the grid)
+- [ ] Grow Hinglish dev past 41 tasks before G2: the 150-rewrite goal tightens the intervals
+
+**G0 passed on 2026-10-24** (Qwen3.5-4B Q4_K_M): runs reproduce, splits are locked, and the
+target is written down.
 
 **G0 exit:** the two raw runs agree within their intervals, `SPLITS.lock` is committed, and
 the launch target is written down.
