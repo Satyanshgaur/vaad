@@ -63,7 +63,8 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
 - [ ] Reach 150 Hinglish rewrites by Week 3 (adding tasks needs a deliberate re-lock)
 - [x] `value_heavy`: 50 scenarios × 3 languages, 11 tools, including 3 `clarify` scenarios
       where asking back is the only correct answer (AI-drafted, not yet checked)
-- [x] Splits frozen in `harness/tasks/SPLITS.lock`: 211 dev / 289 test tasks. Rebuilding from
+- [x] Splits frozen in `harness/tasks/SPLITS.lock`: 211 dev / 286 test tasks (one BFCL pair dropped
+      from test because its question repeats a dev task). Rebuilding from
       pinned upstream revisions reproduces them byte-for-byte (`harness/tasks/README.md`)
 - [x] Test-split policy: **hashed-private**. Test tasks and their sources live in the private
       repo `Satyanshgaur/vaad-private` (`scripts/private_sync.sh`). Only hashes are public:

@@ -227,7 +227,6 @@
 0fe580fe496708328b44 bfcl_hi:live_simple_218-117-10
 0ff32398dfa3d56ff152 vh:train-04:hinglish
 100ea214e99be54b5661 bfcl_en:live_simple_30-8-0
-1021792cd8885c762e91 bfcl_en:live_parallel_14-10-0
 1027103b18cbb12b325d bfcl_hi:live_parallel_12-8-0
 1039f4c57f97e1a60d45 bfcl_hi:live_irrelevance_512-151-1
 103e47e7ae3adc0bbdee bfcl_hinglish:live_parallel_multiple_20-17-0
@@ -250,7 +249,6 @@
 119762cf461e487f9240 bfcl_hi:live_multiple_1014-243-0
 11bdd184c7edeb252cf8 bfcl_hi:live_irrelevance_451-119-0
 11c42501b5470cab71e8 bfcl_hi:live_simple_113-69-0
-12572b6c87520911b2b0 bfcl_hi:live_parallel_14-10-0
 127faf6775ddaeb7fd49 bfcl_hi:live_parallel_multiple_12-10-1
 1285db3db7787ad8548f bfcl_hi:live_multiple_517-150-5
 12a4560e4394877f2a35 bfcl_hinglish:live_simple_143-95-0
@@ -385,7 +383,6 @@
 1c32f6cc164b6b2f0c49 bfcl_hi:live_multiple_336-133-0
 1c3a7718640001ab2a62 bfcl_hi:live_simple_245-127-0
 1c4291da2d48962003fc bfcl_en:live_simple_102-61-0
-1c4acde7c003fc61831d bfcl_en:live_parallel_14-10-0
 1c5a5b6fd8ea60b6c869 bfcl_hi:live_multiple_919-191-7
 1c734b7c5e8b260c0569 bfcl_hi:live_irrelevance_45-2-33
 1c860e22cbaa7fd0f73b bfcl_hi:live_simple_218-117-10
@@ -401,7 +398,6 @@
 1d2be0aa6c1b0980896c bfcl_hi:live_irrelevance_451-119-0
 1d301e3508c9706a8438 bfcl_hi:live_multiple_651-161-19
 1d48da3243c374c1e4a5 bfcl_hinglish:live_irrelevance_512-151-1
-1d5dccffebce9af7da79 bfcl_en:live_parallel_14-10-0
 1d6dfa10c233f211f96c bfcl_en:live_simple_89-50-0
 1db38bfe3bad344684eb bfcl_en:live_multiple_326-132-16
 1db53a6663b41b9c0c81 bfcl_en:live_simple_189-114-0
@@ -858,7 +854,6 @@
 3e1b4931cdb28d78ebdb bfcl_hi:live_parallel_multiple_20-17-0
 3e25ad4ec9e4c0fcbf4c bfcl_en:live_parallel_multiple_20-17-0
 3e80e0fa2010e3ea4d02 bfcl_hi:live_multiple_673-162-15
-3e827f0e6da525f3c002 bfcl_en:live_parallel_14-10-0
 3e85702cb4702b8d97dc bfcl_en:live_multiple_262-125-1
 3e9d4a8d449803125804 bfcl_en:live_simple_212-117-4
 3eabeb4129bd17f131ac bfcl_hi:live_multiple_560-155-0
@@ -1163,7 +1158,6 @@
 5548824af31dd6e4c6c3 vh:train-01:en
 554e2fa30e2ccd562547 bfcl_en:live_multiple_858-180-6
 557aee27883d18cbc335 bfcl_en:live_multiple_858-180-6
-55837486c5b5c06ac4fc bfcl_en:live_parallel_14-10-0
 55884048b88d1b0cee32 bfcl_hi:live_simple_113-69-0
 558c691b1f110a21dfd8 bfcl_hinglish:live_simple_143-95-0
 559c3b0d6fdd85947655 bfcl_en:live_simple_109-66-0
@@ -1616,7 +1610,6 @@
 75e319f85926798e6226 bfcl_hi:live_simple_239-125-2
 75eff6d5f02943c8d9ae bfcl_hinglish:live_irrelevance_512-151-1
 76100f3922442e23563b bfcl_en:live_parallel_5-2-0
-76154076f5f4de060898 bfcl_hi:live_parallel_14-10-0
 762315366735bc77de01 bfcl_hinglish:live_parallel_multiple_20-17-0
 762af0f065a10b466937 bfcl_en:live_simple_239-125-2
 7640f83d3cbca3993028 vh:train-02:hi
@@ -2028,7 +2021,6 @@
 94c3ee2e03681a817fdd bfcl_en:live_multiple_651-161-19
 9502bc2176c3b2a4a6fe bfcl_en:live_multiple_651-161-19
 95128cf62bb68d1fb3a4 bfcl_hinglish:live_multiple_127-49-0
-95186492939b5509155e bfcl_en:live_parallel_14-10-0
 952053c032f6c96956bd bfcl_hi:live_simple_30-8-0
 9526da2ad505bfa8db4b bfcl_en:live_parallel_multiple_20-17-0
 952d39b84f9dcdcd833a bfcl_en:live_parallel_12-8-0
@@ -2159,7 +2151,6 @@
 9ea09a3c812f121a513f bfcl_en:live_simple_245-127-0
 9ebc7e54e48f13850829 bfcl_hi:live_multiple_192-86-0
 9ebcadafdca89b4d821c bfcl_hi:live_irrelevance_90-2-78
-9ec4d23015f358376a03 bfcl_en:live_parallel_14-10-0
 9ecb41aec95568cc102e bfcl_hi:live_multiple_676-163-1
 9ecd0c0e06dbffc405ac bfcl_hi:live_simple_97-57-1
 9edc663a8038bf61e865 bfcl_hi:live_multiple_262-125-1
@@ -2513,7 +2504,6 @@ b918836ef638a3d999d4 bfcl_hi:live_simple_109-66-0
 b91d2c2299720b95f476 bfcl_hi:live_simple_113-69-0
 b92197bb25f404eb1b14 bfcl_en:live_simple_92-53-0
 b925f93f1c9b163562ab bfcl_hi:live_parallel_12-8-0
-b9281c46c1f67d7fe4fb bfcl_hi:live_parallel_14-10-0
 b9383404e38943d86bd2 bfcl_en:live_multiple_1014-243-0
 b94c9170ea6fe3d59836 bfcl_hinglish:live_simple_245-127-0
 b957a8d76f22eea98c04 bfcl_hi:live_multiple_771-171-4
@@ -2620,7 +2610,6 @@ c0482698a5563f608c32 bfcl_en:live_simple_109-66-0
 c04cf3c0247b79710d1e bfcl_en:live_simple_113-69-0
 c04d1ddec44178c914e5 bfcl_hi:live_simple_19-3-15
 c06f1196e66250d4f22a bfcl_en:live_multiple_676-163-1
-c0953dc92ec9dcba30eb bfcl_en:live_parallel_14-10-0
 c09797817a17dacdbf0e bfcl_hi:live_irrelevance_451-119-0
 c09bbde1d43d487d39d1 bfcl_hi:live_multiple_858-180-6
 c0b584a22c69aecb65c4 bfcl_en:live_parallel_multiple_20-17-0
@@ -2673,7 +2662,6 @@ c3d2481c6e0d1ad8e5e0 bfcl_en:live_simple_199-116-7
 c3ddc0d948eb3866a949 bfcl_en:live_simple_30-8-0
 c3e394e6774c99ed3ed5 bfcl_en:live_multiple_853-180-1
 c3ec585487718e2243b1 vh:appt-02:hi
-c3efc5e73f00dd4a64e0 bfcl_hi:live_parallel_14-10-0
 c3f311a86ff9bd3f63ea bfcl_en:live_irrelevance_512-151-1
 c408f9589ef62e2cc8df bfcl_hi:live_parallel_multiple_12-10-1
 c40f49e301234cfb3a84 bfcl_hi:live_simple_89-50-0
@@ -2901,7 +2889,6 @@ d389d6d52570ec4d85ec bfcl_hi:live_simple_109-66-0
 d38e8b066fc2983c63dc bfcl_en:live_irrelevance_451-119-0
 d392265e812aa10035a5 bfcl_hi:live_multiple_919-191-7
 d39bf20aa9fb17e8436b bfcl_en:live_multiple_75-34-1
-d39c54cafa1771a8a550 bfcl_en:live_parallel_14-10-0
 d3a7d747626b7d502551 bfcl_en:live_simple_245-127-0
 d3be64b7ae3939acdf46 bfcl_en:live_irrelevance_698-227-1
 d3e8ac107ca08458e391 bfcl_en:live_multiple_913-191-1
@@ -3444,7 +3431,6 @@ f99089cc8fef73ebb62c bfcl_en:live_multiple_120-45-5
 f9b5448461c3baaf330a vh:bill-04:hi
 f9b93c9da0187facc7f9 bfcl_en:live_parallel_multiple_20-17-0
 f9d028f1d48451244c44 bfcl_en:live_simple_112-68-0
-f9e04fc63edd42844b10 bfcl_hi:live_parallel_14-10-0
 f9facfa51ddddcfa91aa bfcl_en:live_multiple_120-45-5
 f9fada031e26c0962304 bfcl_en:live_parallel_multiple_12-10-1
 f9fdd8275428b1723a80 bfcl_hi:live_simple_113-69-0

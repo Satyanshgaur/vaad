@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from harness.schema import Task
+from harness.schema import Message, Task
 from harness.split import assign, check_lock, split_tasks, write_lock, write_split
 
 
@@ -78,3 +78,20 @@ def test_allow_missing_private_split(tmp_path: Path) -> None:
     assert check_lock(root, allow_missing="test/") == []
     (root / "dev" / "raw.jsonl").write_text("")
     assert check_lock(root, allow_missing="test/") == ["dev/raw.jsonl modified"]
+
+
+@pytest.mark.unit
+def test_test_pairs_repeating_dev_text_are_dropped() -> None:
+    dev_pair = next(f"p{i}" for i in range(100) if assign(f"p{i}") == "dev")
+    test_pair = next(f"p{i}" for i in range(100) if assign(f"p{i}") == "test")
+    same = "What's the weather in Boston?"
+    tasks = [
+        make_task(dev_pair).model_copy(update={"messages": [Message(role="user", content=same)]}),
+        make_task(test_pair, "en").model_copy(
+            update={"messages": [Message(role="user", content=f"  {same.upper()} ")]}
+        ),
+        make_task(test_pair, "hi"),
+    ]
+    splits = split_tasks(tasks)
+    assert [t.pair_id for t in splits["dev"]] == [dev_pair]
+    assert splits["test"] == []  # whole pair dropped, every language

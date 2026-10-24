@@ -33,22 +33,39 @@ def assign(pair_id: str, dev_fraction: float = DEV_FRACTION) -> Split:
     return "dev" if bucket < dev_fraction else "test"
 
 
+def _norm(text: str) -> str:
+    return " ".join(text.casefold().split())
+
+
 def split_tasks(tasks: list[Task]) -> dict[Split, list[Task]]:
+    """Assign by pair_id, then drop test pairs whose user text repeats a dev task verbatim.
+
+    BFCL reuses some questions under different ids (and with different tools), so a hash split
+    alone would put the same text in both splits. Dropping from test keeps dev stable.
+    """
     out: dict[Split, list[Task]] = {"dev": [], "test": []}
     for t in tasks:
         out[assign(t.pair_id)].append(t)
+    dev_texts = {_norm(t.user_text()) for t in out["dev"]}
+    leaked = {t.pair_id for t in out["test"] if _norm(t.user_text()) in dev_texts}
+    out["test"] = [t for t in out["test"] if t.pair_id not in leaked]
     return out
 
 
 def write_split(src: Path, tasks_root: Path) -> None:
     """Write each source file's tasks into tasks_root/{dev,test}/<same name>."""
     files = sorted(src.rglob("*.jsonl")) if src.is_dir() else [src]
-    for file in files:
-        for name, tasks in split_tasks(load_tasks(file)).items():
-            out = tasks_root / name / file.name
+    by_file = {file.name: load_tasks(file) for file in files}
+    splits = split_tasks([t for tasks in by_file.values() for t in tasks])
+    for name, kept in splits.items():
+        kept_ids = {t.id for t in kept}
+        for file_name, tasks in by_file.items():
+            out = tasks_root / name / file_name
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(
-                "".join(t.model_dump_json(exclude_none=True) + "\n" for t in tasks),
+                "".join(
+                    t.model_dump_json(exclude_none=True) + "\n" for t in tasks if t.id in kept_ids
+                ),
                 encoding="utf-8",
             )
 

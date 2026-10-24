@@ -19,12 +19,12 @@
       "tasks": 69
     },
     "test/bfcl_en.jsonl": {
-      "sha256": "2f8db4fa99954394b3f3308f0e0d2bda2e67ae2902eeffa3f88c9ead82a7489b",
-      "tasks": 88
+      "sha256": "9d40d0f835f81cdfaac4a3021ee60dbe6ba57ea1df184f795678ad13a761b6c9",
+      "tasks": 87
     },
     "test/bfcl_hi.jsonl": {
-      "sha256": "ed25c53e13213ecda8581c32e740ca90fa064015446c9038fbb534642d765a41",
-      "tasks": 88
+      "sha256": "05d4f7d78bf1722ceee9521ef407b7ea74339a724312b847e6f7a37fe6259ec9",
+      "tasks": 87
     },
     "test/bfcl_hinglish.jsonl": {
       "sha256": "c3774851149777b31b02fbab0e2fc9a73db3fad925f25ee6521d885e9728a79c",
