@@ -1,0 +1,26 @@
+# Copy to config/vaad.yaml and edit. Thresholds are tuned on the dev split only.
+gateway_enabled: true
+
+small:
+  url: http://127.0.0.1:8080        # llama-server --jinja -ngl 99 -m <4-bit model>.gguf
+  model: small-q4
+
+strong:
+  url: http://127.0.0.1:8081        # 8-bit of the same model, or any OpenAI-compatible URL
+  model: strong-q8
+
+routing:
+  min_tools_for_strong: 4
+  strong_on_indic_with_values: true
+
+thresholds:
+  pass: 0.9
+  retry: 0.6
+
+trace_path: traces/vaad.jsonl
+
+# Per-tool overrides: force a value type, or protect a field as free text.
+overrides: {}
+#  create_order:
+#    customer_name: free_text
+#    weight: unit_kg
