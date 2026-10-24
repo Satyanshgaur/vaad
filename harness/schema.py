@@ -29,6 +29,8 @@ class ExpectedCall(BaseModel):
     name: str
     arguments: dict[str, list[Any]] = Field(default_factory=dict)
     optional: list[str] = Field(default_factory=list)
+    # Free-text arguments (messages, notes): must be a non-empty string, wording not scored.
+    free_text: list[str] = Field(default_factory=list)
 
 
 class Task(BaseModel):
@@ -37,14 +39,21 @@ class Task(BaseModel):
     lang: Lang
     # Same pair_id across a task's English/Hindi/Hinglish versions; splits are made on it.
     pair_id: str
-    category: Literal["simple", "multiple", "parallel", "relevance"] = "simple"
+    # "irrelevance": no tool fits, call nothing. "clarify": the turn is ambiguous (e.g. "kal"
+    # with no tense cue), so executing any call is wrong; asking back is right.
+    category: Literal[
+        "simple", "multiple", "parallel", "parallel_multiple", "irrelevance", "clarify"
+    ] = "simple"
     messages: list[Message]
     tools: list[dict[str, Any]]
-    # Empty for relevance tasks: the correct behaviour is to call nothing.
+    # Empty for irrelevance and clarify tasks: the correct behaviour is to call nothing.
     expected_calls: list[ExpectedCall]
     # Argument names that carry Indic values (amounts, dates...), for per-field breakdowns.
     value_fields: list[str] = Field(default_factory=list)
     ref_date: date | None = None
+    # Where the task came from, and who has checked it (native speakers for rewrites).
+    provenance: str = ""
+    checked_by: list[str] = Field(default_factory=list)
 
     def user_text(self) -> str:
         return "\n".join(m.content for m in self.messages if m.role == "user")

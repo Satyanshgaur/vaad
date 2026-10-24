@@ -54,6 +54,12 @@ class TestCalls:
     def test_required_missing(self) -> None:
         assert not call_matches(tc("ship"), ec("ship", date=["x"]))
 
+    def test_free_text_present_but_not_scored(self) -> None:
+        expected = ExpectedCall(name="remind", arguments={"time": ["08:00"]}, free_text=["text"])
+        assert call_matches(tc("remind", time="08:00", text="kiraya bharna"), expected)
+        assert not call_matches(tc("remind", time="08:00"), expected)
+        assert not call_matches(tc("remind", time="08:00", text=" "), expected)
+
     def test_parallel_any_order(self) -> None:
         predicted = [tc("pay", amount=500), tc("pay", amount=900)]
         expected = [ec("pay", amount=[900]), ec("pay", amount=[500])]
