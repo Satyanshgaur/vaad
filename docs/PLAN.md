@@ -52,6 +52,33 @@ The test baselines are measured in that same Phase 4 run.
   "saade nau baje" → 21:00, "parson" → today, and a transfer executed to a 9-digit phone.
 - Reports: `harness/reports/g0-qwen3.5-4b-Q4_K_M/` (`raw-a`, `raw-b`, `raw-seeds4-7`, `prompt`).
 
+### G0 grid: compression (claim C1), raw model, dev, seeds 0–3
+
+pass^4 per language. The change is 4-bit minus 8-bit, with a paired 95% CI.
+
+| Model | Language | Q8_0 | Q4_K_M | Change | Schema-valid (Q8→Q4) | Wrong-value (Q8→Q4) |
+|---|---|---|---|---|---|---|
+| Qwen3.5-4B | English | 0.776 | 0.824 | +4.7 [0.0, +10.6] | 97% → 97% | 7.9% → 7.6% |
+| Qwen3.5-4B | Hindi | 0.376 | 0.447 | **+7.1 [+1.2, +14.1]** | 96% → 95% | 31.8% → 33.2% |
+| Qwen3.5-4B | Hinglish | 0.390 | 0.341 | −4.9 [−17.1, +7.3] | 95% → 95% | 37.8% → 34.8% |
+| Llama-3.2-3B | English | 0.259 | 0.294 | +3.5 [−1.2, +9.4] | 42% → 46% | 10.0% → 8.5% |
+| Llama-3.2-3B | Hindi | 0.094 | 0.129 | +3.5 [−2.4, +9.4] | 40% → 44% | 21.2% → 20.3% |
+| Llama-3.2-3B | Hinglish | 0.146 | 0.146 | 0.0 [0.0, 0.0] | 32% → 31% | 17.7% → 15.9% |
+
+- **C1 is not supported at this scale.** Going from 8-bit to 4-bit never hurts Hindi or
+  Hinglish more than English. The only change whose CI excludes zero is a Hindi *gain* for
+  Qwen. A possible cause is the unsloth imatrix used for that 4-bit file (untested). Per the
+  brief's fallback, the paper leads with the **language gap and wrong-value execution**, which
+  hold at both precisions. C1 becomes an analysis ("compression is not the problem here"), and
+  Phase 3's controlled std-vs-Indic imatrix quants should test it properly.
+- **Llama-3.2-3B often breaks the tool-call format.** Only 31–46% of its calls are
+  schema-valid. Numbers come back as strings (`"weight_kg": "1"`), and 7–15% of trials are
+  output llama-server cannot parse (scored as failed trials, `error` field). Its low
+  wrong-value rate is a side effect: most calls fail schema validation before a value can be
+  wrong. This makes Llama the stronger test case for Phase 1's grammar layer.
+- Reports: `harness/reports/g0-{qwen3.5-4b,llama3.2-3b}-{Q8_0,Q4_K_M}/raw-a`
+  (`scripts/baseline_grid.sh`).
+
 Measured seconds per call: **2.69 s mean, 1.81 s p50, 7.3 s p95** (Qwen3.5-4B Q4_K_M, RTX 3050
 6 GB, thinking off, 211 dev tasks, 2026-10-24). With thinking on, a call takes ~7.9 s, so the
 grid runs with thinking off. Launch grid budget: ~24k calls × 2.69 s ≈ **18 GPU-hours**. The
@@ -73,7 +100,8 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
 - [x] Shortlist: **Qwen3.5-4B** (primary) and **Llama-3.2-3B** (second family), each at Q8_0
       and Q4_K_M, plus **Qwen3.5-0.8B** Q8_0 for the CI smoke gate. Files in `~/models/`
 - [x] Qwen3.5-4B emits native tool calls via `scripts/llama_server.sh` (`--jinja`)
-- [ ] Same check for Llama-3.2-3B and Qwen3.5-0.8B
+- [x] Llama-3.2-3B emits native tool calls (but often malformed; see the G0 grid)
+- [ ] Same check for Qwen3.5-0.8B (needed for gate 9 in Phase 1)
 - [x] Record the GGUF files and SHA256 hashes in `harness/models.yaml`
 - [x] Time one call and fill in the budget above (2.69 s: no fallback needed)
 
@@ -105,7 +133,7 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
 - [x] Raw model on dev, 4 seeds, run **twice**, plus a seeds 4–7 run (`scripts/baseline_g0.sh`)
 - [x] Strong-prompt baseline (`harness/prompts/strong_system.txt`)
 - [x] Fill in the launch target table above
-- [ ] Same baseline for Llama-3.2-3B and for both Q8_0 quants (C1 needs the grid)
+- [x] Same baseline for Llama-3.2-3B and for both Q8_0 quants (C1 not supported; see above)
 - [ ] Grow Hinglish dev past 41 tasks before G2: the 150-rewrite goal tightens the intervals
 
 **G0 passed on 2026-10-24** (Qwen3.5-4B Q4_K_M): runs reproduce, splits are locked, and the
