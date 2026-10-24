@@ -56,6 +56,25 @@ def bootstrap_ci(
     return fmean(values), lo, hi
 
 
+def paired_bootstrap_ci(
+    treatment: Sequence[float],
+    control: Sequence[float],
+    n_resamples: int = 10_000,
+    alpha: float = 0.05,
+    seed: int = 0,
+) -> tuple[float, float, float]:
+    """CI of the mean per-task difference (treatment - control) on the same tasks.
+
+    This is the launch-claim test: a gain is real when the lower bound is above 0. Pairing
+    removes between-task variance, so it is much tighter than comparing two separate CIs.
+    """
+    if len(treatment) != len(control):
+        raise ValueError("paired scores must cover the same tasks, in the same order")
+    return bootstrap_ci(
+        [t - c for t, c in zip(treatment, control, strict=True)], n_resamples, alpha, seed
+    )
+
+
 def intervals_overlap(a: tuple[float, float, float], b: tuple[float, float, float]) -> bool:
     """A gain counts as real only when this is False."""
     return a[1] <= b[2] and b[1] <= a[2]

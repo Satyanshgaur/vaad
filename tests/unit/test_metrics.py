@@ -5,6 +5,7 @@ import pytest
 from harness.metrics import (
     bootstrap_ci,
     intervals_overlap,
+    paired_bootstrap_ci,
     pass_at_k,
     pass_hat_k,
     per_task_scores,
@@ -73,3 +74,20 @@ def test_percentile() -> None:
     assert percentile(values, 50) == 50
     assert percentile(values, 95) == 95
     assert percentile([3.0], 95) == 3.0
+
+
+@pytest.mark.unit
+class TestPairedBootstrap:
+    def test_consistent_gain_is_significant_even_when_intervals_overlap(self) -> None:
+        control = [0.0, 0.25, 0.5, 0.75, 1.0] * 8
+        treatment = [min(1.0, c + 0.25) for c in control]
+        assert intervals_overlap(bootstrap_ci(treatment, 2000), bootstrap_ci(control, 2000))
+        mean, lo, _ = paired_bootstrap_ci(treatment, control, 2000)
+        assert mean > 0 and lo > 0
+
+    def test_no_difference(self) -> None:
+        assert paired_bootstrap_ci([0.5] * 10, [0.5] * 10, 500) == (0.0, 0.0, 0.0)
+
+    def test_length_mismatch(self) -> None:
+        with pytest.raises(ValueError):
+            paired_bootstrap_ci([1.0], [1.0, 0.0])
