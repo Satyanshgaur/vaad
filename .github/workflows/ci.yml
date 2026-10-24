@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+
+      - name: "Gate 1: lint and format"
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: "Gate 2: types (strict on canon/, router/, grammar/)"
+        run: uv run mypy
+
+      - name: "Gate 3: unit tests"
+        # Coverage gate on vaad.canon (--cov-fail-under=90) switches on in Phase 2.
+        run: uv run pytest tests/unit -m unit --cov=vaad --cov-report=term-missing
+
+      - name: "Gate 10: leakage guard"
+        run: uv run python -m harness.leakage
+
+      - name: "Split lock unchanged"
+        if: hashFiles('harness/tasks/SPLITS.lock') != ''
+        run: uv run python -m harness.split check harness/tasks
+
+  # Gates switched on by later phases:
+  #   4 golden canonicalization  -> Phase 2: pytest tests/golden -m golden
+  #   5 property tests           -> Phase 2: pytest tests/property -m property
+  #   6 no value invention       -> Phase 2: part of golden + property suites
+  #   7 proxy contract           -> Phase 1: pytest tests/integration -m integration
+  #   8 latency budget           -> Phase 2: pytest-benchmark, p95 < 20 ms / 1k canonicalizations
+  #   9 smoke eval               -> Phase 1: 50 dev tasks, tiny model on CPU, 1 seed
