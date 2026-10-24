@@ -1,0 +1,7 @@
+# Gate 4: fixed input -> expected canonical value. Goes live in Phase 2; target 300+ cases.
+# Every PR touching canon/ adds cases here. ref_date is 2026-10-24 unless stated.
+# - {type: number, input: "nau sau", expected: 900}
+# - {type: money, input: "5 lakh", expected: 500000}
+# - {type: date, input: "kal tak bhej do", field: delivery_date, expected: "2026-10-25"}
+# - {type: date, input: "kal", field: date, expected: flag}
+cases: []
