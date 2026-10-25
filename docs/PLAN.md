@@ -101,7 +101,7 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
       and Q4_K_M, plus **Qwen3.5-0.8B** Q8_0 for the CI smoke gate. Files in `~/models/`
 - [x] Qwen3.5-4B emits native tool calls via `scripts/llama_server.sh` (`--jinja`)
 - [x] Llama-3.2-3B emits native tool calls (but often malformed; see the G0 grid)
-- [ ] Same check for Qwen3.5-0.8B (needed for gate 9 in Phase 1)
+- [x] Qwen3.5-0.8B Q8_0 emits native tool calls too (English and Hinglish weather query, valid JSON args)
 - [x] Record the GGUF files and SHA256 hashes in `harness/models.yaml`
 - [x] Time one call and fill in the budget above (2.69 s: no fallback needed)
 
