@@ -105,3 +105,27 @@ def test_system_prompt_merges_into_existing_system_message() -> None:
     messages = build_request(task, cond, 0, 0.7)["messages"]
     assert [m["role"] for m in messages] == ["system", "user"]
     assert messages[0]["content"] == "Be ISO.\n\nToday is X."
+
+
+@pytest.mark.unit
+@respx.mock
+def test_unparseable_model_output_is_a_failed_trial() -> None:
+    message = "The model produced output that does not match the expected peg-native format"
+    respx.post("http://backend/v1/chat/completions").mock(
+        return_value=httpx.Response(500, json={"error": {"code": 500, "message": message}})
+    )
+    relevance = TASK.model_copy(update={"expected_calls": [], "category": "irrelevance"})
+    with httpx.Client() as client:
+        result, _ = run_trial(client, relevance, COND, seed=0, temperature=0.7)
+    # Even where calling nothing is right, a malformed call attempt is wrong.
+    assert (result.correct, result.schema_valid, result.error) == (False, False, message)
+
+
+@pytest.mark.unit
+@respx.mock
+def test_other_server_errors_still_abort() -> None:
+    respx.post("http://backend/v1/chat/completions").mock(
+        return_value=httpx.Response(500, json={"error": {"message": "CUDA out of memory"}})
+    )
+    with httpx.Client() as client, pytest.raises(httpx.HTTPStatusError):
+        run_trial(client, TASK, COND, seed=0, temperature=0.7)
