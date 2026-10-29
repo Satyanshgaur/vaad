@@ -27,5 +27,37 @@ models:
     role: CI smoke gate (CPU)
     quants:
       Q8_0: {file: qwen3.5-0.8b/Qwen3.5-0.8B-Q8_0.gguf, sha256: 0ad885ffd4bb022fc4f0d33a3308fa108ef8613159d3b3a67e23abca056b7a6c}
+  - name: granite-4.0-micro
+    hf_repo: ibm-granite/granite-4.0-micro-GGUF
+    base_model: ibm-granite/granite-4.0-micro
+    license: apache-2.0
+    role: third family (3B) for the pre-registered follow-up (docs/PREREG.md)
+    quants:
+      Q4_K_M: {file: granite-4.0-micro/granite-4.0-micro-Q4_K_M.gguf, sha256: 97c417dcc0534b0737c74016fb2af083cb17c3b51eaac621192d23961b7024eb}
+  - name: phi-4-mini
+    hf_repo: unsloth/Phi-4-mini-instruct-GGUF
+    base_model: microsoft/Phi-4-mini-instruct
+    license: mit
+    role: fourth family (3.8B), follow-up
+    quants:
+      Q4_K_M: {file: phi-4-mini/Phi-4-mini-instruct-Q4_K_M.gguf, sha256: 88c00229914083cd112853aab84ed51b87bdf6b9ce42f532d8c85c7c63b1730a}
+  - name: qwen3.5-4b-noimat
+    hf_repo: unsloth/Qwen3.5-4B-GGUF   # BF16 source file
+    base_model: Qwen/Qwen3.5-4B
+    license: apache-2.0
+    role: controlled quants for H4. Built by scripts/make_quants.sh from the BF16 GGUF with
+      llama-quantize (commit df9beac) and NO importance matrix, so Q3_K_M is harsher than
+      most published Q3 files
+    source: {file: qwen3.5-4b-src/Qwen3.5-4B-BF16.gguf, sha256: 9e6e2841a75f503ccb330831832fd7861266e187e0dbf149a954219ccb8c197a}
+    quants:
+      Q4_K_M: {file: qwen3.5-4b-noimat/Qwen3.5-4B-Q4_K_M-noimat.gguf, sha256: 14a328657cee35fa0b31ab7035a37f42e6bf41754a7b72a7410c236ef9bcb7e4}
+      Q3_K_M: {file: qwen3.5-4b-noimat/Qwen3.5-4B-Q3_K_M-noimat.gguf, sha256: e89beebdc36bdee404af041ebb2cad82c740f353c170909ad5257276a05bf1b2}
+  - name: bge-m3
+    hf_repo: ggml-org/bge-m3-Q8_0-GGUF
+    base_model: BAAI/bge-m3
+    license: mit
+    role: multilingual embeddings for field-aware rescoring (harness/rescore.py); not a tool-calling model
+    quants:
+      Q8_0: {file: bge-m3/bge-m3-q8_0.gguf, sha256: aa473d51f451a22f0fcf39ba3330c14bed38a385712b1113440f69df4047a173}
 # Note: the unsloth/bartowski quants use their own imatrix calibration. Phase 3 builds its own
 # standard- and Indic-calibrated Q4_K_M from the base weights so the comparison is controlled.
