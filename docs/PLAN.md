@@ -111,10 +111,12 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
 - [x] `bfcl_en`: paired Gorilla BFCL v4 live originals. Licence is **Apache-2.0**. Both
       languages use BFCL-Hi's (v2) functions and answers; pairs whose answer changed in v4
       are dropped
-- [x] `bfcl_hinglish`: first 50 rewrites (AI-drafted, **not yet native-speaker checked**)
-- [ ] Reach 150 Hinglish rewrites by Week 3 (adding tasks needs a deliberate re-lock)
+- [x] `bfcl_hinglish`: first 89 rewrites (AI-drafted, then reviewed by a native Hindi speaker
+      and an AI pass, 2026-10-29; 9 fixes applied)
+- [ ] Reach 150 Hinglish rewrites by Week 3 (adding tasks needs a deliberate re-lock). 61 left,
+      all in the test split (decision pending on who drafts them)
 - [x] `value_heavy`: 50 scenarios × 3 languages, 11 tools, including 3 `clarify` scenarios
-      where asking back is the only correct answer (AI-drafted, not yet checked)
+      where asking back is the only correct answer (AI-drafted, then native-reviewed by a Hindi speaker, 2026-10-29; 11 fixes applied, "kal" trap in statement-01 kept)
 - [x] Splits frozen in `harness/tasks/SPLITS.lock`: 211 dev / 286 test tasks (one BFCL pair dropped
       from test because its question repeats a dev task). Rebuilding from
       pinned upstream revisions reproduces them byte-for-byte (`harness/tasks/README.md`)

@@ -4,7 +4,7 @@
 |---|---|---|
 | `bfcl_hi` | NVIDIA BFCL-Hi (CC-BY-4.0), read as raw JSON, not via `datasets` | ~150 |
 | `bfcl_en` | Gorilla BFCL v4 live originals (Apache-2.0), same ids as BFCL-Hi | ~150 |
-| `bfcl_hinglish` | Romanized/code-mixed rewrites of the same tasks (50 so far, unreviewed) | ~150 |
+| `bfcl_hinglish` | Romanized/code-mixed rewrites of the same tasks (89 so far, native-reviewed) | ~150 |
 | `value_heavy` | Written for this project: e-commerce, banking, delivery, booking × 3 langs | 50 × 3 |
 
 Every line is one `harness.schema.Task`. Tasks sharing a `pair_id` are versions of one task.
