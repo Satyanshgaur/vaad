@@ -120,8 +120,10 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
       so 150 is not reached.
 - [x] `value_heavy`: 50 scenarios × 3 languages, 11 tools, including 3 `clarify` scenarios
       where asking back is the only correct answer (AI-drafted, then native-reviewed by a Hindi speaker, 2026-10-29; 11 fixes applied, "kal" trap in statement-01 kept)
-- [x] Splits frozen in `harness/tasks/SPLITS.lock`: 211 dev / 286 test tasks (one BFCL pair dropped
-      from test because its question repeats a dev task). Rebuilding from
+- [x] Splits frozen in `harness/tasks/SPLITS.lock`: 211 dev / 286 test tasks at G0, re-locked on
+      2026-10-29 to **250 dev / 338 test** after the Hinglish growth and the native-review fixes
+      (one BFCL pair dropped from test because its question repeats a dev task). The G0
+      baseline numbers below are on the original 211-task dev set (see docs/DATA.md). Rebuilding from
       pinned upstream revisions reproduces them byte-for-byte (`harness/tasks/README.md`)
 - [x] Test-split policy: **hashed-private**. Test tasks and their sources live in the private
       repo `Satyanshgaur/vaad-private` (`scripts/private_sync.sh`). Only hashes are public:
@@ -139,7 +141,8 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
 - [x] Strong-prompt baseline (`harness/prompts/strong_system.txt`)
 - [x] Fill in the launch target table above
 - [x] Same baseline for Llama-3.2-3B and for both Q8_0 quants (C1 not supported; see above)
-- [ ] Grow Hinglish dev past 41 tasks before G2: the 150-rewrite goal tightens the intervals
+- [x] Grow Hinglish dev past 41 tasks before G2: now 80 Hinglish dev tasks (57 BFCL + 23 value-heavy).
+      The G0 raw baseline must be re-run on the current dev set before comparing to it
 
 **G0 passed on 2026-10-24** (Qwen3.5-4B Q4_K_M): runs reproduce, splits are locked, and the
 target is written down.
@@ -246,16 +249,17 @@ Indic-calibrated quant has been compared with the standard one on dev.
 ## Things only you can do
 
 - [x] Build llama.cpp and download the candidate GGUFs
-- [ ] Find 2–3 native Hinglish speakers to check a task sample and the lexicons
+- [x] Find native Hindi speakers to check the task sets: two found (one per set, 2026-10-29).
+      Still open: a reviewer for the 51 batch-3 test rewrites, and the lexicons (Phase 2)
 - [x] Confirm the Gorilla BFCL licence (Apache-2.0) and each base model's licence for quants
 - [ ] Choose the strong tier for the demo: a local 8-bit model on Kaggle, or a hosted Indic API
-- [ ] Write the first Hinglish and value-heavy tasks (an assistant can draft them, but a human
-      must check them)
+- [x] Write the first Hinglish and value-heavy tasks (AI-drafted, native-reviewed)
 
 ## Open questions (from the brief)
 
 - [x] Name and licence: **vaad**, Apache-2.0.
 - [x] Which base models: Qwen3.5-4B + Llama-3.2-3B (both licences allow redistributing quants;
       Llama needs a "Built with Llama" attribution).
-- [ ] Who are the native-speaker reviewers?
+- [x] Who are the native-speaker reviewers? Two for the data (names in `checked_by`); more are
+      needed for the lexicons and for inter-annotator agreement
 - [ ] Which strong tier for the demo?
