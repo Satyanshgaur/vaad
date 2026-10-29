@@ -190,8 +190,55 @@ in-flight request appears twice in its gateway trace (1001 lines).
   gate 7 tests); the CI gates that exist at this phase (1, 2, 3, 7, 9, 10, split lock) run on
   every PR (gates 4, 5, 6 and 8 belong to Phase 2).
 
-## R8. Raw baseline on the current dev set, and the model comparison  *pending*
+## R8. Raw baselines on the current dev set, and the model comparison  *in progress*
 
-Filled in as the pre-registered runs finish (`harness/reports/f1-*`): Qwen3.5-4B, Granite-4.0-
-micro, Phi-4-mini, Llama-3.2-3B (Q4_K_M), then the no-imatrix Q4_K_M and Q3_K_M and the 0.8B
-model. Decision rules: PREREG.md.
+Raw condition (no gateway, no system prompt), Q4_K_M, current 250-task dev set, 4 seeds,
+temperature 0.7, thinking off for Qwen. Reports `harness/reports/f1-<model>-Q4_K_M/raw`.
+Decision rules: PREREG.md. Finished so far: Qwen3.5-4B, Granite-4.0-micro. Still running or
+queued: Phi-4-mini, Llama-3.2-3B, the no-imatrix Q4_K_M and Q3_K_M, Qwen3.5-0.8B.
+
+| Model | Language (tasks) | pass@1 | pass^4 | Schema-valid | Wrong-value | p50 latency |
+|---|---|---|---|---|---|---|
+| Qwen3.5-4B | English (85) | 0.856 | 0.824 [0.74, 0.89] | 96.8% | 7.6% | 1.28 s |
+| Qwen3.5-4B | Hindi (85) | 0.509 | 0.435 [0.33, 0.54] | 95.3% | 33.2% | 1.34 s |
+| Qwen3.5-4B | Hinglish (80) | 0.656 | 0.575 [0.46, 0.69] | 97.5% | 23.7% | 1.30 s |
+| Granite-4.0-micro | English (85) | 0.771 | 0.706 [0.60, 0.80] | 98.8% | 14.4% | 0.64 s |
+| Granite-4.0-micro | Hindi (85) | 0.518 | 0.471 [0.36, 0.58] | 96.8% | 35.3% | 0.69 s |
+| Granite-4.0-micro | Hinglish (80) | 0.578 | 0.512 [0.40, 0.62] | 98.1% | 30.9% | 0.60 s |
+
+Qwen3.5-4B's English and Hindi numbers equal the G0 values (same tasks); Hinglish rose from
+0.341 to 0.575 only because the Hinglish dev set grew from 41 to 80 tasks and changed (R6b).
+
+### Paired gaps (pass^4, second language minus English, matched `pair_id`s)
+
+| Model | BFCL Hinglish - En (57) | BFCL Hindi - En (62) | Value-heavy Hinglish - En (23) | Value-heavy Hindi - En (23) |
+|---|---|---|---|---|
+| Qwen3.5-4B | -8.8 [-19.3, +1.8] | -37.1 [-51.6, -22.6] | **-65.2 [-82.6, -43.5]** | -43.5 [-65.2, -26.1] |
+| Granite-4.0-micro | -5.3 [-17.5, +5.3] | -17.7 [-32.3, -3.2] | **-60.9 [-78.3, -39.1]** | -39.1 [-60.9, -17.4] |
+
+English BFCL pass^4 (the qualifying floor, PREREG.md >= 0.40): Qwen 0.806, Granite 0.661; both qualify.
+
+**Preliminary reading against the pre-registered rules (not final until Phi-4-mini and Llama are in):**
+- **H1 (consistency gap on natural Hinglish BFCL):** both qualifying models so far have a CI
+  that **includes 0**. The rule says "does not stand" once two qualifying models include 0
+  (with at least three qualifying models). The earlier -12.3 [-22.8, -1.8] came from Qwen with
+  the gateway on; with the gateway off it is -8.8 [-19.3, +1.8]. Whether the rule can be applied
+  depends on a third model qualifying.
+- **H1b (spoken-form value gap, value-heavy):** the CI excludes 0 for both models, by a wide
+  margin (-61 to -65 points). This part stands so far.
+- The Hindi BFCL gap differs a lot by model (-37 vs -18); its explanation is H2 (pending).
+
+### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
+
+| Condition minus raw | English | Hindi | Hinglish |
+|---|---|---|---|
+| gateway, strict date grammar | -3.5 [-8.2, 0.0] | -1.2 [-5.9, +3.5] | -5.0 [-11.3, 0.0] |
+| gateway, loose date grammar | -3.5 [-8.2, 0.0] | -4.7 [-10.6, 0.0] | -2.5 [-10.0, +3.7] |
+
+**Schema tightening, validation and one retry do not improve accuracy; the point estimates are
+slightly negative in every cell** (all intervals touch 0). They raise schema validity (about 96%
+to 100%) without fixing wrong values, and may cost a few points. This is the "grammar
+constraints hurt" risk in the brief's risk table. Possible causes (untested): the `maxLength`
+cap and inferred enums constraining generation, and the retry note sometimes steering the model
+away from a correct first call. The right response is to isolate the pieces in the Phase 2
+ablations, not to claim a gain from grammar.
