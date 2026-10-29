@@ -410,6 +410,52 @@ problem for 3-4B models**; the canonicalizer's potential value is the full gap m
 translate-first achieves (H6, pending), not a small residual. Caveat: the prompt is one wording;
 a better prompt or few-shot examples inside the conversation were not tried.
 
+### R13. H6: script control and translate-first (2026-10-31)
+
+Lean plan (PREREG A4): script control on Qwen3.5-4B and Ministral-3-3B, translate-first on Qwen
+only, so by the pre-registered "2 of 3 models" rule **these are descriptive, not decisions**.
+Dev set, Q4_K_M, 4 seeds, paired pass^4 against the same model's raw Devanagari/Hinglish run.
+Reports `harness/reports/h67-<model>-{roman,translate}`.
+
+**Script control** (`hi-roman`: Devanagari spans deterministically romanized, e.g. "mera ordar kal
+tak bhej do"; `harness/romanize.py`). If Hindi were a script or tokenization problem, Roman script
+should help:
+
+| Model | Set | Hindi | Romanized | Change | Gap to English closed |
+|---|---|---|---|---|---|
+| Qwen3.5-4B | BFCL-Hi (62) | 43.5 | 24.2 | **-19.4 [-30.6, -8.1]** | -52% |
+| Qwen3.5-4B | value-heavy Hindi (23) | 43.5 | 17.4 | **-26.1 [-43.5, -8.7]** | -60% |
+| Ministral-3-3B | BFCL-Hi (62) | 16.1 | 17.7 | +1.6 [-6.5, +9.7] | 4% |
+| Ministral-3-3B | value-heavy Hindi (23) | 8.7 | 17.4 | +8.7 [-13.0, +30.4] | 12% |
+
+Romanizing makes Qwen **much worse** and leaves Ministral unchanged. The share of call-needing
+BFCL-Hi trials with **no tool call** rises (Qwen 10% to 25%, Ministral 34% to 47%). So the Hindi gap
+is **not a script or tokenization problem** for these models; Devanagari is the better input.
+Caveat: my romanization is a heuristic with unnatural spellings ("ordar", "sarhe"), so Roman text
+is also further from natural Hinglish than real chat text; a real Hinglish rewrite of the same
+tasks (the Hinglish set) is the fairer Roman-script comparison.
+
+**Translate-first** (same Qwen model translates the Hindi or Hinglish turn to English at
+temperature 0, then makes the call on the translation):
+
+| Set | Raw | Translate-first | Change | Gap closed |
+|---|---|---|---|---|
+| BFCL-Hi (62) | 43.5 | 53.2 | +9.7 [0.0, +19.4] | 26% |
+| value-heavy Hindi (23) | 43.5 | 60.9 | **+17.4 [+4.3, +34.8]** | 40% |
+| value-heavy **Hinglish** (23) | 21.7 | 26.1 | +4.3 [-8.7, +17.4] | **7%** |
+
+Translate-first helps Hindi somewhat (no-tool-call share on BFCL-Hi falls from 10% to 3%) but
+closes **26-40%** of the Hindi gap, not most, and **7%** of the spoken-value gap: translating
+"dedh kilo" with the same small model does not turn it into 1.5. It also doubles the calls per
+request. (The translation is made by the model under test; a stronger translator was not tried.)
+
+**Ministral's Hindi collapse** is therefore about the Hindi *language* prompt, not Devanagari and not
+a parser: it persists in Roman script, has zero parse failures (R10 diagnosis), and the no-call
+share is the same order whether or not the text is Devanagari.
+
+**For the canonicalizer:** neither a prompt (R12: 7-27%) nor a translate-first stage (7%) fixes
+spoken-form values on these models. That is the gap a deterministic layer targets.
+
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
 | Condition minus raw | English | Hindi | Hinglish |
