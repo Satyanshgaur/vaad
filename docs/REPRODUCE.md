@@ -91,6 +91,17 @@ uv run python -m harness.smoke --base-url http://127.0.0.1:8080                 
 uv run python -m harness.smoke --base-url http://127.0.0.1:8080 --write-baseline  # re-baseline
 ```
 
+## Memory (long evals)
+
+llama-server keeps a prompt cache in RAM, up to 8192 MiB by default. On the 15 GB machine used
+here the Linux out-of-memory killer terminated llama-server twice during the follow-up runs
+(2026-10-29, 17:24 and 18:03 IST). `scripts/llama_server.sh` now passes `--cache-ram 2048`
+(`CACHE_RAM` overrides). **Which runs used which:** G0, g1-strict and the first part of g1-loose
+used the 8192 MiB default; servers started after PR "cap prompt cache" (all `f1-*` runs and any
+restart) use 2048. The cache only reuses identical prompt prefixes, so outputs for a fixed seed
+should not change, but this has not been verified bit-for-bit. `harness.run --resume` and the
+restart loop in `scripts/lib_resilient.sh` recover from a killed server.
+
 ## Determinism notes
 
 - llama-server is deterministic for a fixed `seed`, model, build and hardware: re-running seeds

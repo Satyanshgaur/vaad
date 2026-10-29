@@ -78,6 +78,9 @@ reviewer asks "why did you...", the answer should be here.
 - **Leakage guard caught a test sentence in a test fixture** (2026-10-29); fixtures must use
   neutral text.
 
+- **Cap llama-server's prompt cache at 2048 MiB** (2026-10-30) after two out-of-memory kills
+  of long runs; recorded in REPRODUCE.md because earlier runs used the 8192 MiB default.
+
 ## Process
 
 - One change per PR with a conventional-commit title; squash-free merge commits.
