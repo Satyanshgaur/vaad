@@ -27,8 +27,8 @@
       "tasks": 87
     },
     "test/bfcl_hinglish.jsonl": {
-      "sha256": "5d75c8b28a42b4cefccb64c33c45fe94adf150acda9707e088b2bc8b95e1ea06",
-      "tasks": 32
+      "sha256": "ad8284bab47206b2f05bc16c6ed79222aead3f35d48b088506f4f333e1168c1e",
+      "tasks": 83
     },
     "test/value_heavy.jsonl": {
       "sha256": "30575bc94463e4452f5ff86c3bad0e7847b1240da22a9d1fe6af8fe4e2993b99",

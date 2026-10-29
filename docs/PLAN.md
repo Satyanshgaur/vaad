@@ -113,8 +113,11 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
       are dropped
 - [x] `bfcl_hinglish`: first 89 rewrites (AI-drafted, then reviewed by a native Hindi speaker
       and an AI pass, 2026-10-29; 9 fixes applied)
-- [ ] Reach 150 Hinglish rewrites by Week 3 (adding tasks needs a deliberate re-lock). 61 left,
-      all in the test split (decision pending on who drafts them)
+- [x] Hinglish grown to 140 rewrites (57 dev, 83 test). The last 51, all in test, were drafted
+      by Claude on 2026-10-29 and had only an AI pass, so they are marked `native_checked: false`
+      (CSV for reviewers: `private/review/hinglish_rewrites_batch3.csv`). 4 test tasks with
+      non-English originals (Korean, Thai, Chinese, one meta-prompt) have no Hinglish version,
+      so 150 is not reached.
 - [x] `value_heavy`: 50 scenarios × 3 languages, 11 tools, including 3 `clarify` scenarios
       where asking back is the only correct answer (AI-drafted, then native-reviewed by a Hindi speaker, 2026-10-29; 11 fixes applied, "kal" trap in statement-01 kept)
 - [x] Splits frozen in `harness/tasks/SPLITS.lock`: 211 dev / 286 test tasks (one BFCL pair dropped

@@ -197,11 +197,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"wrote {len(chosen)} tasks to {path}")
     if args.hinglish:
         source = yaml.safe_load(args.hinglish.read_text(encoding="utf-8"))
+        en_tasks = [pair[1] for pair in chosen]
         tasks = hinglish_tasks(
-            [pair[1] for pair in chosen],
+            en_tasks,
             source["tasks"],
             source.get("checked_by"),
             source.get("native_checked", False),
+        )
+        # Later batches that only an AI pass has seen; never claim a native check for them.
+        tasks += hinglish_tasks(
+            en_tasks, source.get("tasks_ai_only", {}), source.get("ai_only_checked_by")
         )
         path = args.out_dir / "bfcl_hinglish.jsonl"
         path.write_text(
