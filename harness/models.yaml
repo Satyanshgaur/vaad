@@ -59,6 +59,17 @@ models:
     role: third qualifying family (3B), added by PREREG amendment A2
     quants:
       Q4_K_M: {file: ministral-3-3b/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf, sha256: 9ed150d4367e68df0ac8e1540f6ddc65b42d0ee26378329d1ecbca60f93fc5f8}
+  - name: qwen3.5-4b-h8
+    hf_repo: unsloth/Qwen3.5-4B-GGUF   # BF16 source file, same as qwen3.5-4b-noimat
+    base_model: Qwen/Qwen3.5-4B
+    license: apache-2.0
+    role: H8 calibration-vs-allocation arms (scripts/make_h8_arms.sh); Q4_K_M from BF16, df9beac
+    imatrix_calibration: {en: "English Wikipedia paragraphs, 80x512 tokens", indic: "Hindi Wikipedia, half Devanagari half romanized, 80x512 tokens"}
+    quants:
+      A1-en: {file: qwen3.5-4b-h8/A1-en.gguf, sha256: 6036a8c1af71daeb21a26cda0cca30082572c177161c3f77ff7bca83adc8d4e2}
+      A2-indic: {file: qwen3.5-4b-h8/A2-indic.gguf, sha256: 01ca624dfdeab36e3374a6c6b9ee9900b3c04bc9e5c4b17141ed9159deab38d1}
+      A3-alloc: {file: qwen3.5-4b-h8/A3-alloc.gguf, sha256: 6eb06d528b3a5c4eec28351662060ae04574a1a39254c7fc94542ec36ea9810a}
+    imatrix: {en: 2d5ae0e1c3462896cc2fb3fd7bd38db4e89bc6ebccaa1192f81548ebf01a8686, indic: ba37973dbe5a61834e7fd0fc308600c295320ecc05f9b052100f33b2449ac2d9}
   - name: bge-m3
     hf_repo: ggml-org/bge-m3-Q8_0-GGUF
     base_model: BAAI/bge-m3

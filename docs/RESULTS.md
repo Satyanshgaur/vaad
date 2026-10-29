@@ -456,6 +456,50 @@ share is the same order whether or not the text is Devanagari.
 **For the canonicalizer:** neither a prompt (R12: 7-27%) nor a translate-first stage (7%) fixes
 spoken-form values on these models. That is the gap a deterministic layer targets.
 
+### R14. H8: calibration versus tensor allocation (Qwen3.5-4B Q4_K_M, 2026-10-31)
+
+All arms built by us from the BF16 file at one llama.cpp commit (`scripts/make_h8_arms.sh`), full
+dev set, 4 seeds, raw scoring. Calibration texts (80 chunks of 512 tokens, ~42k tokens each,
+`scripts/make_calibration.py`): English = English Wikipedia paragraphs; Indic = Hindi Wikipedia,
+half Devanagari, half romanized with `harness/romanize.py`. No task text. Reports
+`harness/reports/f1-qwen3.5-4b-h8-*`.
+
+pass^4 in points:
+
+| Set | A0 no imatrix | A1 English imatrix | A2 Indic imatrix | A3 unsloth tensor types, no imatrix | unsloth Q4_K_M |
+|---|---|---|---|---|---|
+| BFCL English (62) | 66.1 | 71.0 | 74.2 | 72.6 | 80.6 |
+| BFCL Hindi (62) | 37.1 | 35.5 | 37.1 | 35.5 | 43.5 |
+| BFCL Hinglish (57) | 61.4 | 63.2 | 70.2 | 59.6 | 71.9 |
+| value-heavy English (23) | 87.0 | 82.6 | 78.3 | 82.6 | 87.0 |
+| value-heavy Hindi (23) | 47.8 | 39.1 | 39.1 | 43.5 | 43.5 |
+| value-heavy Hinglish (23) | 13.0 | 21.7 | 21.7 | 21.7 | 21.7 |
+
+Paired differences (points; CI over tasks):
+
+| Contrast | BFCL English | BFCL Hindi | BFCL Hinglish | Value-heavy Hinglish |
+|---|---|---|---|---|
+| **calibration**: A1 - A0 | +4.8 [-4.8, +16.1] | -1.6 [-9.7, +6.5] | +1.8 [-7.0, +10.5] | +8.7 [0.0, +21.7] |
+| **allocation**: A3 - A0 | +6.5 [-1.6, +16.1] | -1.6 [-6.5, +3.2] | -1.8 [-8.8, +5.3] | +8.7 [0.0, +21.7] |
+| **Indic vs English imatrix**: A2 - A1 | +3.2 [-3.2, +9.7] | +1.6 [-4.8, +8.1] | **+7.0 [-1.8, +17.5]** | 0.0 [-13.0, +13.0] |
+| remainder: unsloth - A3 | +8.1 [0.0, +16.1] | +8.1 [0.0, +16.1] | **+12.3 [+1.8, +22.8]** | 0.0 [-13.0, +13.0] |
+| total: unsloth - A0 | **+14.5 [+6.5, +24.2]** | +6.5 [-1.6, +14.5] | +10.5 [0.0, +22.8] | +8.7 [0.0, +21.7] |
+
+**Verdicts (pre-registered, PREREG A3; one model, so the same caveat as C1):**
+- **Calibration matters** (A1 - A0 excludes 0 on BFCL English): **not shown** (+4.8, CI includes 0).
+- **Allocation matters** (A3 - A0 excludes 0): **not shown** (+6.5, CI includes 0).
+- **Indic calibration helps** (A2 - A1 >= +5 on BFCL Hindi, BFCL Hinglish or value-heavy Hinglish
+  with the CI excluding 0, English not worse by more than 3): **not met**. BFCL Hinglish gains +7.0
+  but the interval includes 0 (-1.8); BFCL Hindi +1.6; value-heavy Hinglish 0.0.
+- What is established: the **total** unsloth effect on BFCL English is +14.5 [+6.5, +24.2]. Allocation
+  alone (+6.5) and an English imatrix alone (+4.8) each explain about a third to a half of it and
+  neither is individually significant; unsloth over our allocation-matched no-imatrix arm adds
+  +8.1 [0.0, +16.1]. They look roughly additive, but with 62 tasks a CI is about +-10 points, so
+  this is **under-powered to separate them**.
+- So the earlier statement that a "14.5-point swing from calibration alone" could be an Indic
+  calibration result is **not supported**: calibration alone is about +5 and not significant, and the
+  Indic-specific part is a non-significant +3 to +7. A larger task set or more seeds would be needed.
+
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
 | Condition minus raw | English | Hindi | Hinglish |

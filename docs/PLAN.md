@@ -268,8 +268,9 @@ Run in this order, on dev only, thresholds fixed beforehand:
 narrowed to spoken numbers, dates and times. H7 (RESULTS R12): a worked-conversion prompt
 recovers 7-27% of the gap and costs English 3-10 points, so prompting does not replace the
 canonicalizer. H6 (RESULTS R13): romanizing Hindi hurts, translate-first closes 26-40% of the Hindi gap and
-7% of the spoken-value gap. H8 (calibration vs allocation) is next; the independent test set has
-no author yet.
+7% of the spoken-value gap. H8 (RESULTS R14): the 14.5-point unsloth effect is roughly allocation
++ calibration and cannot be split; Indic calibration not shown. The independent test set has no
+author yet.
 
 Deferred to v2: multi-turn tasks; voice clips and real Hinglish requests (Sarvam/Gnani);
 models above 4B; quants below Q3.
