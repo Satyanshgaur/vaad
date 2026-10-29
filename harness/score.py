@@ -5,6 +5,7 @@ Each expected argument lists its acceptable values. Parallel calls match in any 
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from itertools import permutations
 from typing import Any
 
@@ -31,7 +32,16 @@ def values_equal(predicted: Any, expected: Any) -> bool:
     return bool(predicted == expected)
 
 
-def call_matches(predicted: ToolCall, expected: ExpectedCall) -> bool:
+# (argument name, predicted value, expected value) -> equal? Lets rescoring swap in field-aware
+# comparison for free-text and name fields while identifiers stay exact.
+ValueMatcher = Callable[[str, Any, Any], bool]
+
+
+def _exact(_arg: str, predicted: Any, expected: Any) -> bool:
+    return values_equal(predicted, expected)
+
+
+def call_matches(predicted: ToolCall, expected: ExpectedCall, match: ValueMatcher = _exact) -> bool:
     if predicted.name != expected.name:
         return False
     if predicted.arguments.keys() - expected.arguments.keys() - set(expected.free_text):
@@ -45,29 +55,33 @@ def call_matches(predicted: ToolCall, expected: ExpectedCall) -> bool:
             if arg in expected.optional:
                 continue
             return False
-        if not any(values_equal(predicted.arguments[arg], v) for v in acceptable):
+        if not any(match(arg, predicted.arguments[arg], v) for v in acceptable):
             return False
     return True
 
 
-def calls_match(predicted: list[ToolCall], expected: list[ExpectedCall]) -> bool:
+def calls_match(
+    predicted: list[ToolCall], expected: list[ExpectedCall], match: ValueMatcher = _exact
+) -> bool:
     """True when the predicted calls are exactly the expected ones, in any order."""
     if len(predicted) != len(expected):
         return False
     if not expected:
         return True  # irrelevance or clarify task: correctly called nothing
     if len(expected) > MAX_PERMUTED_CALLS:
-        return _greedy_match(predicted, expected)
+        return _greedy_match(predicted, expected, match)
     return any(
-        all(call_matches(p, e) for p, e in zip(perm, expected, strict=True))
+        all(call_matches(p, e, match) for p, e in zip(perm, expected, strict=True))
         for perm in permutations(predicted)
     )
 
 
-def _greedy_match(predicted: list[ToolCall], expected: list[ExpectedCall]) -> bool:
+def _greedy_match(
+    predicted: list[ToolCall], expected: list[ExpectedCall], match: ValueMatcher = _exact
+) -> bool:
     remaining = list(predicted)
     for e in expected:
-        hit = next((p for p in remaining if call_matches(p, e)), None)
+        hit = next((p for p in remaining if call_matches(p, e, match)), None)
         if hit is None:
             return False
         remaining.remove(hit)

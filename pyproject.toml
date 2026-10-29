@@ -37,6 +37,7 @@ dev = [
     "mypy>=1.11",
     "types-PyYAML",
     "types-jsonschema",
+    "indic-transliteration>=2.3.82",
 ]
 
 [build-system]
@@ -76,6 +77,10 @@ disallow_untyped_calls = true
 warn_return_any = true
 no_implicit_reexport = true
 strict_equality = true
+
+[[tool.mypy.overrides]]
+module = ["indic_transliteration.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 pythonpath = [".", "src"]
