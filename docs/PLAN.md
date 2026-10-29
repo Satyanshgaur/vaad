@@ -246,6 +246,21 @@ Indic-calibrated quant has been compared with the standard one on dev.
 
 ---
 
+## Follow-up experiments (pre-registered in PREREG.md, 2026-10-30)
+
+Run in this order, on dev only, thresholds fixed beforehand:
+- [x] Paired pass^4 English vs Hinglish on matched tasks (`harness/compare.py`): existing runs
+      are inconclusive on 18 pairs; see RESULTS R6b
+- [ ] Raw dev runs on the current dev set: Qwen3.5-4B, Granite-4.0-micro, Phi-4-mini,
+      Llama-3.2-3B (all Q4_K_M), then H1 and H1b
+- [ ] Field-aware rescoring of BFCL-Hi (`harness/rescore.py`), human audit of about 50 cases
+      (`private/review/rescore_audit.csv`), then H2 and H3
+- [ ] Qwen3.5-4B Q4_K_M and Q3_K_M built without an imatrix (`scripts/make_quants.sh`), H4
+- [ ] Qwen3.5-0.8B on the full dev set, H5 (descriptive)
+
+Deferred to v2: multi-turn tasks; voice clips and real Hinglish requests (Sarvam/Gnani);
+models above 4B; quants below Q3.
+
 ## Things only you can do
 
 - [x] Build llama.cpp and download the candidate GGUFs

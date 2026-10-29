@@ -88,6 +88,49 @@ Actions runner: schema-valid 0.98, correct 0.56; the whole job took 4.2 minutes 
 - Strict date grammar accepted by llama-server and produces well-formed ISO dates; one
   observed confident-wrong date ("kal" with today = 2026-10-24 gave 2026-10-24).
 
+## R6b. Paired language gaps from existing runs (2026-10-30, exploratory)
+
+`python -m harness.compare <results.jsonl ...>`: pass^4 difference (second language minus
+English) on **matched** `pair_id`s, bootstrap CI over tasks. Raw G0 runs use the original dev
+set, so BFCL-Hinglish has only **18** matched pairs there; the gateway run uses the current dev
+set (57 pairs). This is exploratory; the pre-registered version (H1) uses raw runs on the
+current dev set (see PREREG.md and R8).
+
+| Run | BFCL Hinglish - En | BFCL Hindi - En | Value-heavy Hinglish - En | Value-heavy Hindi - En |
+|---|---|---|---|---|
+| Qwen3.5-4B Q4_K_M raw (G0) | -22.2 [-44.4, 0.0] (18) | -35.5 [-48.4, -22.6] (62) | -65.2 [-82.6, -43.5] (23) | -43.5 [-65.2, -26.1] (23) |
+| Qwen3.5-4B Q8_0 raw (G0) | -5.6 [-27.8, +16.7] (18) | -37.1 [-50.0, -24.2] (62) | -60.9 [-78.3, -39.1] (23) | -47.8 [-69.6, -26.1] (23) |
+| Llama-3.2-3B Q4_K_M raw (G0) | -5.6 [-22.2, +11.1] (18) | -21.0 [-32.3, -9.7] (62) | -17.4 [-34.8, -4.3] (23) | -4.3 [-21.7, +8.7] (23) |
+| Llama-3.2-3B Q8_0 raw (G0) | 0.0 [-16.7, +16.7] (18) | -17.7 [-29.0, -8.1] (62) | -13.0 [-26.1, 0.0] (23) | -13.0 [-26.1, 0.0] (23) |
+| Qwen3.5-4B Q4_K_M, **gateway on, strict** (G1, current dev) | **-12.3 [-22.8, -1.8] (57)** | -33.9 [-46.8, -21.0] (62) | -65.2 [-82.6, -43.5] (23) | -43.5 [-65.2, -26.1] (23) |
+
+(Values in points of pass^4; the matched-pair count is in parentheses.) Findings:
+- On the 18-pair G0 sets every BFCL Hinglish-vs-English interval includes 0 (Qwen Q4 touches
+  it), so those runs cannot decide the consistency question. The only 57-pair run excludes 0
+  but is one model with the gateway on.
+- Per-trial accuracy (pass@1) on Hinglish BFCL is near English (0.79 vs 0.80), yet pass^4
+  differs by 12 points: the Hinglish deficit is **inconsistency across seeds**, not a lower
+  per-try success rate. An earlier statement of "near parity" referred to pass@1 only.
+- Value-heavy gaps are large and clear for Qwen at both precisions and smaller for Llama.
+- The BFCL Hindi gap is large for every model, but see R6c: much of it is the answer key.
+
+## R6c. Where the Hindi "wrong values" come from (2026-10-30, exploratory)
+
+Qwen3.5-4B Q4_K_M, gateway on, current dev, BFCL-Hi. Of 83 single-call string mismatches, 44
+had a Devanagari prediction; **43 of those are free-text fields** (`content`, `Title`,
+`MetaDescription`, `keyword`, `query`, `new_alarm_name`...), one is an actor name (`starring`).
+None are enums or ids. The model kept the user's language in free text while the BFCL-Hi answer
+key kept English. One genuine error: a Devanagari URL slug (`UrlName`). So the BFCL Hindi gap
+mixes real failures with an answer-key artifact; field-aware rescoring (H2) quantifies it.
+
+Failure mix, Hinglish: wrong-value 65-70% of failures, wrong tool or missing arg 26-31%,
+schema-invalid 5%. Among wrong-value arguments in Hinglish: 43 numbers, 10 times, 4 dates,
+14 strings, 11 other.
+
+Only 16 of the 57 dev BFCL-Hinglish tasks need a number, date or time value, and at most 8 of
+those use a spoken form: BFCL-Hinglish barely tests normalization. Value-heavy is the only set
+that does, and it was written adversarially (traps by design).
+
 ## R7. G1 grammar ablation (strict vs loose date grammar)  *pending*
 
 Run: `scripts/grammar_ablation.sh strict loose` (Qwen3.5-4B Q4_K_M through the gateway, **current
