@@ -60,4 +60,6 @@ class Trace:
     raw_args: list[dict[str, Any]] = field(default_factory=list)
     canon_args: list[dict[str, Any]] = field(default_factory=list)
     decision: Decision | None = None
+    status: int | None = None
+    error: str | None = None
     stage_ms: dict[str, float] = field(default_factory=dict)

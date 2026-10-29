@@ -1,0 +1,59 @@
+name: smoke
+
+# Gate 9: 50 dev tasks through the 0.8B model on CPU, one seed, compared to
+# harness/reports/smoke_baseline.json. Catches a broken request path, not a quality change.
+on:
+  pull_request:
+    paths: ["src/**", "harness/**", "scripts/**", ".github/workflows/smoke.yml", "pyproject.toml"]
+  workflow_dispatch:
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # b11860 is llama.cpp commit df9beac, the build in harness/models.yaml.
+  LLAMA_TAG: b11860
+  MODEL_FILE: Qwen3.5-0.8B-Q8_0.gguf
+  MODEL_SHA256: 0ad885ffd4bb022fc4f0d33a3308fa108ef8613159d3b3a67e23abca056b7a6c
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+
+      - name: llama.cpp (prebuilt CPU binary)
+        run: |
+          mkdir -p "$HOME/tools/llama.cpp/build/bin"
+          curl -sSfL "https://github.com/ggml-org/llama.cpp/releases/download/${LLAMA_TAG}/llama-${LLAMA_TAG}-bin-ubuntu-x64.tar.gz" \
+            | tar -xz --strip-components=1 -C "$HOME/tools/llama.cpp/build/bin"
+          "$HOME/tools/llama.cpp/build/bin/llama-server" --version
+
+      - name: Model cache
+        id: model
+        uses: actions/cache@v4
+        with:
+          path: ~/models
+          key: model-${{ env.MODEL_SHA256 }}
+      - name: Download model
+        if: steps.model.outputs.cache-hit != 'true'
+        run: |
+          uvx --from huggingface_hub hf download unsloth/Qwen3.5-0.8B-GGUF "$MODEL_FILE" \
+            --local-dir "$HOME/models/qwen3.5-0.8b"
+      - name: Verify model hash
+        run: echo "$MODEL_SHA256  $HOME/models/qwen3.5-0.8b/$MODEL_FILE" | sha256sum -c -
+
+      - name: Start llama-server and run the smoke eval
+        run: |
+          NGL=0 scripts/llama_server.sh "$HOME/models/qwen3.5-0.8b/$MODEL_FILE" 8080 > server.log 2>&1 &
+          timeout 180 bash -c 'until curl -sf localhost:8080/health >/dev/null; do sleep 2; done'
+          uv run python -m harness.smoke --base-url http://127.0.0.1:8080
+      - name: Server log
+        if: failure()
+        run: tail -50 server.log

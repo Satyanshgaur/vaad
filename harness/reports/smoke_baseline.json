@@ -1,0 +1,8 @@
+{
+  "model": "qwen3.5-0.8b",
+  "quant": "Q8_0",
+  "tasks": 50,
+  "schema_valid": 0.98,
+  "correct": 0.54,
+  "tolerance": 0.1
+}
