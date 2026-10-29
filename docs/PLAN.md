@@ -160,7 +160,7 @@ the launch target is written down.
       (lang, canonical args and decision stay empty until langid and the canonicalizer land)
 - [x] Gate 7: contract tests in `tests/integration/` using a `respx`-mocked backend. Check the
       OpenAI response shape and that passthrough with the gateway off changes nothing
-- [ ] Gate 9: smoke eval on 50 dev tasks with the ~0.5B model on the CI CPU, 1 seed. Compare
+- [x] Gate 9: smoke eval on 50 dev tasks with the ~0.5B model on the CI CPU, 1 seed. Compare
       the schema-valid rate to the stored `harness/reports/smoke_baseline.json`
 - [ ] Kaggle notebook (a): reproduce the baseline on free T4s
 
