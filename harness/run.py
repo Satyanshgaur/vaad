@@ -101,7 +101,13 @@ def schema_valid(calls: list[ToolCall], task: Task) -> bool:
 
 
 def score_trial(
-    task: Task, condition: Condition, seed: int, calls: list[ToolCall], parsed_ok: bool, ms: float
+    task: Task,
+    condition: Condition,
+    seed: int,
+    calls: list[ToolCall],
+    parsed_ok: bool,
+    ms: float,
+    flagged: bool = False,
 ) -> TrialResult:
     correct = calls_match(calls, task.expected_calls)
     valid = parsed_ok and schema_valid(calls, task)
@@ -117,6 +123,7 @@ def score_trial(
         correct=correct,
         schema_valid=valid,
         wrong_value=wrong_value,
+        flagged=flagged,
         latency_ms=ms,
     )
 
@@ -138,7 +145,9 @@ def run_trial(
     response.raise_for_status()
     data = response.json()
     calls, parsed_ok = parse_tool_calls(data)
-    return score_trial(task, condition, seed, calls, parsed_ok, ms), data
+    # The gateway answers with a clarification (vaad_flag) instead of a call it does not trust.
+    flagged = bool(data["choices"][0]["message"].get("vaad_flag"))
+    return score_trial(task, condition, seed, calls, parsed_ok, ms, flagged), data
 
 
 def is_unparseable_output(response: httpx.Response) -> bool:
@@ -200,6 +209,9 @@ def summarize(results: list[TrialResult], tasks: list[Task], k: int) -> dict[str
             "pass@1": bootstrap_ci(per_task_scores(trials, 1, "pass@k")),
             "schema_valid": bootstrap_ci([float(r.schema_valid) for r in flat]),
             "wrong_value": bootstrap_ci([float(r.wrong_value) for r in flat]),
+            # Flagged trials execute nothing, so they count as schema-valid; read this beside
+            # the flag rate and pass@1 so that asking back on everything cannot look good.
+            "flag_rate": bootstrap_ci([float(r.flagged) for r in flat]),
             "latency_ms_p50": percentile([r.latency_ms for r in flat], 50),
             "latency_ms_p95": percentile([r.latency_ms for r in flat], 95),
         }

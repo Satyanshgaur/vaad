@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Phase 1 / G1: dev split through the gateway with a strict and a loose date grammar.
+#   scripts/grammar_ablation.sh [strict|loose ...]     (default: both)
+# One llama-server (Qwen3.5-4B Q4_K_M, GPU) on 8080, the gateway on 8100. Results go to
+# harness/reports/g1-<mode>/. Compare with the raw baseline in harness/reports/g0-*/.
+set -euo pipefail
+MODELS="${MODELS_DIR:-$HOME/models}"
+modes=("$@")
+[ ${#modes[@]} -gt 0 ] || modes=(strict loose)
+work="$(mktemp -d)"
+gw=""
+cleanup() {
+  [ -z "$gw" ] || kill "$gw" 2>/dev/null || true
+  pgrep -x llama-server | xargs -r kill 2>/dev/null || true
+}
+trap cleanup EXIT
+pgrep -x llama-server | xargs -r kill 2>/dev/null || true
+"$(dirname "$0")/llama_server.sh" "$MODELS/qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf" 8080 >"$work/llama.log" 2>&1 &
+timeout 180 bash -c 'until curl -sf localhost:8080/health >/dev/null; do sleep 1; done'
+for mode in "${modes[@]}"; do
+  out="harness/reports/g1-$mode"
+  [ -f "$out/summary.json" ] && { echo "skip $mode (done)"; continue; }
+  mkdir -p "$out"
+  cat >"$work/$mode.yaml" <<EOF
+gateway_enabled: true
+small: {url: "http://127.0.0.1:8080", model: qwen3.5-4b}
+grammar: {date_grammar: $mode}
+trace_path: $out/gateway-trace.jsonl
+EOF
+  .venv/bin/vaad serve --config "$work/$mode.yaml" --port 8100 >"$work/vaad-$mode.log" 2>&1 &
+  gw=$!
+  timeout 60 bash -c 'until curl -sf localhost:8100/healthz >/dev/null; do sleep 1; done'
+  echo "=== grammar date=$mode ($(date +%T))"
+  uv run python -m harness.run --tasks harness/tasks/dev --base-url http://127.0.0.1:8100 \
+      --model qwen3.5-4b --quant Q4_K_M --gateway "grammar-$mode" --no-think --out "$out"
+  kill "$gw"; wait "$gw" 2>/dev/null || true
+  gw=""
+done

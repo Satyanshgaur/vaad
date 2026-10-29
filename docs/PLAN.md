@@ -165,13 +165,14 @@ the launch target is written down.
 - [ ] Kaggle notebook (a): reproduce the baseline on free T4s
 
 **Week 3: grammar and repair**
-- [ ] `grammar/tighten.py`: add `pattern`, `enum` and `maxLength`. Dates get an ISO pattern.
+- [x] `grammar/tighten.py`: add `pattern`, `enum` and `maxLength`. Dates get an ISO pattern.
       Numbers stay numbers. Drop keywords llama.cpp does not support
-- [ ] `grammar/validate.py`: check again after generation (the jsonschema validator already exists)
-- [ ] Guided retry: one retry with the validator errors added to the prompt
-- [ ] Flag response: an assistant message carrying the clarification text plus a `vaad_flag`
+- [x] `grammar/validate.py`: check again after generation (the jsonschema validator already exists)
+- [x] Guided retry: one retry with the validator errors added to the prompt
+- [x] Flag response: an assistant message carrying the clarification text plus a `vaad_flag`
       field, instead of a `tool_call`
-- [ ] Ablation switch: strict date grammar versus loose grammar plus canonicalization
+- [x] Ablation switch: strict date grammar versus loose grammar plus canonicalization
+      (`grammar.date_grammar` in the config; `scripts/grammar_ablation.sh` runs both on dev)
 
 **G1 exit:** passthrough is identical to calling the raw backend, the schema-valid rate is at
 least 99% with grammar on, and gates 1–9 run in CI.
