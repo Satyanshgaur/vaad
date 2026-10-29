@@ -21,7 +21,7 @@ from pathlib import Path
 import pyarrow.parquet as pq
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from harness.romanize import romanize_hindi  # noqa: E402
+from harness.romanize import romanize_hindi
 
 SEED = 20261031
 TARGET_TOKENS = 80 * 512
@@ -75,15 +75,20 @@ def main() -> int:
     # half the budget in Devanagari, half in the same style romanized
     devanagari = build(hindi[:half], args.model, tmp)
     romanized = build(hindi[half:], args.model, tmp, romanize_hindi)
+
     # trim each half to half the budget by tokens, then join
     def cut(text: str) -> str:
         parts = text.split("\n\n")
         keep: list[str] = []
         for part in parts:
             keep.append(part)
-            if len(keep) % 10 == 0 and count_tokens(args.model, "\n\n".join(keep), tmp) >= TARGET_TOKENS // 2:
+            if (
+                len(keep) % 10 == 0
+                and count_tokens(args.model, "\n\n".join(keep), tmp) >= TARGET_TOKENS // 2
+            ):
                 break
         return "\n\n".join(keep)
+
     indic = cut(devanagari) + "\n\n" + cut(romanized)
     (args.out / "calibration_en.txt").write_text(english, encoding="utf-8")
     (args.out / "calibration_indic.txt").write_text(indic, encoding="utf-8")
