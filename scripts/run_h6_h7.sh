@@ -12,23 +12,25 @@ declare -A FILE=(
 )
 declare -A NAME=([qwen]=qwen3.5-4b [granite]=granite-4.0-micro [ministral]=ministral-3-3b)
 declare -A FLAGS=([qwen]="--no-think" [granite]="" [ministral]="")
-want=("$@"); [ ${#want[@]} -gt 0 ] || want=(qwen granite ministral)
+# Lean plan (amendment A4): the decision-critical prompt test first on all three models, then the
+# Hindi diagnostics on Qwen (script control, translate-first) and the script control on Ministral.
 trap 'pgrep -x llama-server | xargs -r kill 2>/dev/null || true' EXIT
-for m in "${want[@]}"; do
-  model="$MODELS/${FILE[$m]}"
-  common=(--tasks harness/tasks/dev --base-url http://127.0.0.1:8080 --model "${NAME[$m]}" --quant Q4_K_M ${FLAGS[$m]})
-  run() {  # run LABEL ARGS...
-    local label="$1"; shift
-    local out="harness/reports/h67-${NAME[$m]}-${label}"
-    [ -f "$out/summary.json" ] && { echo "skip $m $label (done)"; return; }
-    mkdir -p "$out"
-    echo "=== $m $label ($(date +%T))"
-    run_resilient "ensure_llama '$model' 8080 '$out/../h67-${NAME[$m]}-server.log'" -- \
-        "${common[@]}" --gateway "$label" "$@" --out "$out"
-  }
-  run roman     --lang hi --preprocess romanize
-  run translate --lang hi hinglish --preprocess translate
-  run strong    --source value_heavy bfcl_en bfcl_hinglish --system-prompt harness/prompts/strong_system.txt
-  run worked    --source value_heavy bfcl_en bfcl_hinglish --system-prompt harness/prompts/worked_conversions.txt
-  pgrep -x llama-server | xargs -r kill 2>/dev/null || true; sleep 2
-done
+run() {  # run MODEL LABEL ARGS...
+  local m="$1" label="$2"; shift 2
+  local model="$MODELS/${FILE[$m]}"
+  local out="harness/reports/h67-${NAME[$m]}-${label}"
+  [ -f "$out/summary.json" ] && { echo "skip $m $label (done)"; return; }
+  mkdir -p "$out"
+  echo "=== $m $label ($(date +%T))"
+  run_resilient "ensure_llama '$model' 8080 'harness/reports/h67-${NAME[$m]}-server.log'" -- \
+      --tasks harness/tasks/dev --base-url http://127.0.0.1:8080 --model "${NAME[$m]}" \
+      --quant Q4_K_M ${FLAGS[$m]} --gateway "$label" "$@" --out "$out"
+}
+stop() { pgrep -x llama-server | xargs -r kill 2>/dev/null || true; sleep 2; }
+WORKED=(--source value_heavy bfcl_en --system-prompt harness/prompts/worked_conversions.txt)
+for m in qwen granite ministral; do run "$m" worked "${WORKED[@]}"; stop; done
+run qwen roman --lang hi --preprocess romanize
+run qwen translate --lang hi hinglish --source bfcl_hi value_heavy --preprocess translate
+stop
+run ministral roman --lang hi --preprocess romanize
+stop
