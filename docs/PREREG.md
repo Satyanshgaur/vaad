@@ -257,3 +257,8 @@ runs (the Qwen romanized-Hindi run had finished but was not opened):
   "2 of 3 models", so with fewer models H6 can only be **reported descriptively**, not decided; a
   decision needs Granite and Ministral to be added later.
 - H8 (calibration versus allocation) and the independent test set are unchanged.
+
+### Outcome of H7 (2026-10-31)
+Worked-conversion prompt, three families: recovers 27% (Qwen, CI excludes 0), 7% (Granite) and 8%
+(Ministral) of the value-heavy Hinglish gap, with English BFCL changing by -3.2, -9.7 and -6.5.
+**Not met** (RESULTS R12). The canonicalizer's value is not reduced to a residual by prompting.

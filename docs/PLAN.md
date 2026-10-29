@@ -265,7 +265,10 @@ Run in this order, on dev only, thresholds fixed beforehand:
 - [x] Qwen3.5-0.8B on the full dev set, H5 (descriptive)
 
 **Outcome:** H1 does not stand, H1b stands (RESULTS R11, PREREG outcome). Phase 2 goes ahead
-narrowed to spoken numbers, dates and times.
+narrowed to spoken numbers, dates and times. H7 (RESULTS R12): a worked-conversion prompt
+recovers 7-27% of the gap and costs English 3-10 points, so prompting does not replace the
+canonicalizer. H6 (script control, translate-first) and H8 (calibration vs allocation) are running
+or queued; the independent test set has no author yet.
 
 Deferred to v2: multi-turn tasks; voice clips and real Hinglish requests (Sarvam/Gnani);
 models above 4B; quants below Q3.
