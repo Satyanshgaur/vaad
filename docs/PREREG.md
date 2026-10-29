@@ -177,3 +177,66 @@ Per "What each outcome means": H1 does not stand and H1b stands, so natural Hing
 consistent than English at this scale, and spoken-form values are the problem. The project narrows
 to spoken numbers, dates and times; the canonicalizer is kept; the resource (C3) and the targeted
 method lead.
+
+### A3 (2026-10-31, before any of these runs): Hindi diagnosis, prompts, and calibration
+
+Motivation, from RESULTS R11: the Hindi gap persists after rescoring; Ministral answers Hindi in
+prose instead of calling a tool in 34% of call-needing trials (English 7%) with zero parser
+failures; H1b survives only against the raw model; and the "14.5-point imatrix effect" compared our
+no-imatrix Q4_K_M with the unsloth Q4_K_M, which also differs from the llama.cpp default in **99 of
+426 tensors** (48 `ssm_alpha`/`ssm_beta` kept at Q8_0, others at Q5_K), so calibration and tensor
+allocation are confounded. Everything below uses the same protocol as the common protocol above
+(dev only, 4 seeds, temperature 0.7, qualifying families Qwen3.5-4B, Granite-4.0-micro,
+Ministral-3-3B at Q4_K_M, raw scoring primary; rescored numbers are exploratory until the audit).
+"gap" = pass^4(English) - pass^4(the language), matched `pair_id`s.
+
+**H6. Is the Hindi gap a script problem or a translation-quality problem?**
+- `hi-roman` (script control): the Hindi user turn with every Devanagari span deterministically
+  romanized (`harness/romanize.py`: ITRANS, then lower-cased with long-vowel marks dropped), Latin
+  spans, digits and names untouched. Same words, Roman script. Tasks: BFCL-Hi (62) and Hindi
+  value-heavy (23).
+- `translate-first`: a first call to the same model (temperature 0, "translate to English,
+  keep numbers, names and quoted text exactly, output only the translation"), then the normal
+  tool call on the translation. Tasks: Hindi and Hinglish, BFCL and value-heavy (165). The
+  translation is made once per task and reused for the 4 seeds.
+- For each model, delta = pass^4(condition) - pass^4(raw) on BFCL-Hi (paired, 62 tasks).
+  **Script problem** if delta(`hi-roman`) >= 50% of the gap and its CI excludes 0 on >= 2 of 3
+  models; **not a script problem** if its CI includes 0 on >= 2 of 3. **Translate-first closes most
+  of the gap** if delta >= 50% of the gap with the CI excluding 0 on >= 2 of 3 (BFCL-Hi), reported
+  separately for Hinglish value-heavy against its own gap. Otherwise inconclusive.
+- Also reported, not decided: the no-tool-call, malformed-JSON and parse-failure fractions per
+  language and condition (infrastructure check).
+
+**H7. Does H1b survive a prompt?**
+- Conditions: `prompt-strong` (`harness/prompts/strong_system.txt`) and `prompt-worked`
+  (`harness/prompts/worked_conversions.txt`: the strong prompt plus a short generic table of
+  spoken-form conversions, e.g. dedh = 1.5, dhai = 2.5, sava = 1.25, saade teen = 3.5, paune char =
+  3.75, lakh = 100000, crore = 10000000, kal/parson = tomorrow/yesterday or day after
+  tomorrow/day before yesterday by tense). Tasks: all value-heavy (69), BFCL English (62) and BFCL
+  Hinglish (57).
+- **A prompt recovers most of H1b** if, for value-heavy Hinglish, delta(prompt - raw) >= 50% of
+  the gap with the CI excluding 0 on >= 2 of 3 models, **and** BFCL English does not regress (the
+  CI lower bound of the paired change is above -5 points). The worked prompt overlaps the dev
+  traps by design, so its dev number is a ceiling and is circular; it cannot support a claim about
+  a canonicalizer without the independent test set below.
+- If a prompt recovers most of H1b, the canonicalizer's claimed value is restricted to the residual
+  and to guarantees a prompt cannot give (determinism, abstention, auditability).
+
+**H8. Calibration versus tensor allocation (one model, Qwen3.5-4B).** Arms, all built by us from the
+BF16 file at the same llama.cpp commit, Q4_K_M, full dev, 4 seeds:
+- A0 default allocation, no imatrix (exists, `f1-qwen3.5-4b-noimat-Q4_K_M`);
+- A1 default allocation + English imatrix; A2 default allocation + Indic imatrix;
+- A3 unsloth's tensor allocation (copied with `--tensor-type-file`) + no imatrix.
+- Calibration corpora, ~80 chunks of 512 tokens each, no task text or evaluation data: English =
+  English Wikipedia sample; Indic = Hindi Wikipedia sample in Devanagari plus the same text
+  romanized with `harness/romanize.py` (half and half). Sources and sizes recorded in the repo.
+- **Calibration matters** if A1 - A0 has a CI excluding 0 on BFCL English; **allocation matters**
+  if A3 - A0 does. **Indic calibration helps** if A2 - A1 is >= +5 points on BFCL Hindi or Hinglish
+  or value-heavy Hinglish with the CI excluding 0 and English not worse by more than 3 points.
+  Reported next to unsloth - A0 (-14.5 on English BFCL) as a decomposition.
+
+**Independent test set (blocker for any canonicalizer claim).** The value-heavy dev and test sets
+and the lexicons share an author. No canonicalizer gain on value-heavy counts as evidence. A claim
+requires a new set written by native speakers who have not seen the lexicons or the trap list:
+fresh spoken-style requests with gold values, split into tuning and held-out halves, scored once.
+No author is assigned yet. **Real typed requests** (50-100) are likewise not collected yet.
