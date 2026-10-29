@@ -268,3 +268,9 @@ Script control: romanizing Hindi **hurts** Qwen (-19 and -26 points, CIs exclude
 Ministral unchanged, so the Hindi gap is not a script/tokenization problem. Translate-first (Qwen
 only) closes 26% (BFCL-Hi) and 40% (value-heavy Hindi) of the Hindi gap and 7% of the Hinglish
 spoken-value gap: "closes most" is **not met** on any set. RESULTS R13.
+
+### Outcome of H8 (2026-10-31, one model)
+Calibration, allocation and Indic-specific calibration effects are each **not significant** on BFCL
+English (+4.8, +6.5 and +3.2 points, all CIs include 0); the total unsloth effect (+14.5 [+6.5,
++24.2]) is roughly the sum of allocation and calibration and cannot be split with 62 tasks.
+"Indic calibration helps" is **not met** (best case BFCL Hinglish +7.0 [-1.8, +17.5]). RESULTS R14.

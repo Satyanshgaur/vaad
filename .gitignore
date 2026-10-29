@@ -32,3 +32,4 @@ harness/tasks/test/*.jsonl
 harness/sources/
 private/
 harness/reports/**/server.log
+data/calibration/*.txt
