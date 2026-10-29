@@ -142,3 +142,23 @@ fallback applies **only when the prediction contains Devanagari**. Latin predict
 exactly (case-folded). Nothing else in the rules changes. The change was made after seeing the
 first rescored numbers on two models but before any audit and before any claim; the numbers
 reported before the amendment are superseded and are not used.
+
+### A2 (2026-10-30, before the replacement model was run): a third qualifying family
+
+Results so far (RESULTS R10): **Phi-4-mini made 0 tool calls in 880 trials that expected one.** Its
+embedded chat template takes tools as a field on the system message and has no OpenAI-style
+`tools` handling, so llama.cpp never shows it the tools: a setup incompatibility, not evidence
+about the model. **Llama-3.2-3B** is below the English floor (BFCL pass^4 0.33) and emits
+schema-invalid calls 55% of the time. That leaves two independent qualifying families (Qwen3.5-4B,
+Granite-4.0-micro); the no-imatrix Qwen quant is the same family and does not count as a third.
+Under "if fewer than 3 qualify, every hypothesis is inconclusive" the H1-H3 verdicts would stay
+inconclusive.
+
+Amendment: add **Ministral-3-3B-Instruct-2512 (Mistral, Apache-2.0, official GGUF, native tool
+calling, Q4_K_M)** as the third family and run it exactly like the others (raw, current dev set,
+4 seeds, temperature 0.7). It is chosen for being a different family at the same size with
+OpenAI-style tool support, **before** any result from it is seen, and it counts toward the
+qualification rule whatever it scores; if it also falls below the floor, H1-H3 stay
+inconclusive and are reported that way. Phi-4-mini and Llama are reported as non-qualifying.
+No other rule changes. A fourth candidate, if this one fails to produce tool calls, is
+SmolLM3-3B (Apache-2.0).
