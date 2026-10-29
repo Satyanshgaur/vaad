@@ -180,6 +180,10 @@ the launch target is written down.
 **G1 exit:** passthrough is identical to calling the raw backend, the schema-valid rate is at
 least 99% with grammar on, and gates 1–9 run in CI.
 
+**G1 passed on 2026-10-30** (schema-valid 100% on the current dev set, strict and loose; gate 7
+passes; the gates that exist at this phase run in CI). No accuracy gain from grammar and retry
+alone: see RESULTS R7. Strict stays the default.
+
 ## Phase 2: Canonicalizer (Weeks 4–5, ~35 h) → G2
 
 **Week 4: numbers, money, units, phones**
