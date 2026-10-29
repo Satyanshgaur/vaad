@@ -152,11 +152,13 @@ the launch target is written down.
 ## Phase 1: Proxy, grammar, CI (Weeks 2–3, ~30 h) → G1
 
 **Week 2: proxy**
-- [ ] `server/backend.py`: httpx `AsyncClient` per backend, with timeouts and error mapping
-- [ ] `server/routes.py`: `/v1/chat/completions` (non-streaming, with tools) and `/v1/models`
-- [ ] `gateway_enabled: false` gives a byte-faithful passthrough
-- [ ] One JSONL trace per request: lang, tier, raw args, canonical args, decision, ms per stage
-- [ ] Gate 7: contract tests in `tests/integration/` using a `respx`-mocked backend. Check the
+- [x] `server/backend.py`: httpx `AsyncClient` per backend, with timeouts and error mapping
+- [x] `server/routes.py`: `/v1/chat/completions` (non-streaming, with tools) and `/v1/models`.
+      `stream: true` is refused with 400 when the gateway is on and streams through when it is off
+- [x] `gateway_enabled: false` gives a byte-faithful passthrough
+- [x] One JSONL trace per request: lang, tier, raw args, canonical args, decision, ms per stage
+      (lang, canonical args and decision stay empty until langid and the canonicalizer land)
+- [x] Gate 7: contract tests in `tests/integration/` using a `respx`-mocked backend. Check the
       OpenAI response shape and that passthrough with the gateway off changes nothing
 - [ ] Gate 9: smoke eval on 50 dev tasks with the ~0.5B model on the CI CPU, 1 seed. Compare
       the schema-valid rate to the stored `harness/reports/smoke_baseline.json`
