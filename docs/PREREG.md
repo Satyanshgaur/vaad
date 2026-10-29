@@ -129,3 +129,16 @@ Hypothesis:
 - Voice clips through Sarvam or Gnani, and a corpus of real Hinglish requests (consent and API
   cost); the question of voice versus typed stays open.
 - Models above 4B, quants below Q3, models below 0.8B.
+
+## Amendments
+
+### A1 (2026-10-30, before any audit): transliteration applies across scripts only
+
+The name rule said a prediction is accepted "after transliteration ... or a case-folded exact
+match". Inspecting rescored **English** trials showed the phonetic fallback also accepting
+same-script near-misses (`Rutherford, NJ` for `Rutherford`, `Corte Madera` for `Corte Madera,
+CA`), which are format errors in the answer key and not transliterations. Clarified: the phonetic
+fallback applies **only when the prediction contains Devanagari**. Latin predictions must match
+exactly (case-folded). Nothing else in the rules changes. The change was made after seeing the
+first rescored numbers on two models but before any audit and before any claim; the numbers
+reported before the amendment are superseded and are not used.

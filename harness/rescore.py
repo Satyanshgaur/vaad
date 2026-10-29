@@ -119,8 +119,15 @@ def phonetic_key(text: str) -> str:
 
 
 def names_equal(predicted: str, expected: str) -> bool:
+    """Exact (case-folded), or a Devanagari prediction that matches after transliteration.
+
+    The phonetic fallback applies only when the prediction is in another script: a Latin
+    near-miss such as "Rutherford, NJ" for "Rutherford" is a format error and stays wrong
+    (amendment A1 in docs/PREREG.md)."""
     if predicted.strip().casefold() == expected.strip().casefold():
         return True
+    if not _DEVANAGARI.search(predicted):
+        return False
     a, b = phonetic_key(predicted), phonetic_key(expected)
     return bool(a and b) and SequenceMatcher(None, a, b).ratio() >= NAME_SIMILARITY
 

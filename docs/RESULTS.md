@@ -197,14 +197,21 @@ temperature 0.7, thinking off for Qwen. Reports `harness/reports/f1-<model>-Q4_K
 Decision rules: PREREG.md. Finished so far: Qwen3.5-4B, Granite-4.0-micro. Still running or
 queued: Phi-4-mini, Llama-3.2-3B, the no-imatrix Q4_K_M and Q3_K_M, Qwen3.5-0.8B.
 
-| Model | Language (tasks) | pass@1 | pass^4 | Schema-valid | Wrong-value | p50 latency |
-|---|---|---|---|---|---|---|
-| Qwen3.5-4B | English (85) | 0.856 | 0.824 [0.74, 0.89] | 96.8% | 7.6% | 1.28 s |
-| Qwen3.5-4B | Hindi (85) | 0.509 | 0.435 [0.33, 0.54] | 95.3% | 33.2% | 1.34 s |
-| Qwen3.5-4B | Hinglish (80) | 0.656 | 0.575 [0.46, 0.69] | 97.5% | 23.7% | 1.30 s |
-| Granite-4.0-micro | English (85) | 0.771 | 0.706 [0.60, 0.80] | 98.8% | 14.4% | 0.64 s |
-| Granite-4.0-micro | Hindi (85) | 0.518 | 0.471 [0.36, 0.58] | 96.8% | 35.3% | 0.69 s |
-| Granite-4.0-micro | Hinglish (80) | 0.578 | 0.512 [0.40, 0.62] | 98.1% | 30.9% | 0.60 s |
+Per set, never pooled (pass^4 in points, mean [95% CI over tasks]; `python -m harness.breakdown`):
+
+| Set | Language | Tasks | Qwen3.5-4B | Granite-4.0-micro |
+|---|---|---|---|---|
+| BFCL | English | 62 | 80.6 [71.0, 90.3] | 66.1 [54.8, 77.4] |
+| BFCL | Hindi | 62 | 43.5 [30.6, 56.5] | 48.4 [35.5, 61.3] |
+| BFCL | Hinglish | 57 | 71.9 [59.6, 82.5] | 63.2 [50.9, 75.4] |
+| value-heavy | English | 23 | 87.0 [73.9, 100.0] | 82.6 [65.2, 95.7] |
+| value-heavy | Hindi | 23 | 43.5 [21.7, 65.2] | 43.5 [26.1, 65.2] |
+| value-heavy | Hinglish | 23 | 21.7 [4.3, 39.1] | 21.7 [4.3, 39.1] |
+
+Per language over both sets (the pre-registered unit is the set; this is only for comparison
+with G0): Qwen English 0.824, Hindi 0.435, Hinglish 0.575; Granite 0.706, 0.471, 0.512. Schema-valid
+96.8/95.3/97.5% (Qwen) and 98.8/96.8/98.1% (Granite); wrong-value 7.6/33.2/23.7% and
+14.4/35.3/30.9%; p50 latency 1.3 s (Qwen) and 0.6 s (Granite).
 
 Qwen3.5-4B's English and Hindi numbers equal the G0 values (same tasks); Hinglish rose from
 0.341 to 0.575 only because the Hinglish dev set grew from 41 to 80 tasks and changed (R6b).
@@ -227,6 +234,69 @@ English BFCL pass^4 (the qualifying floor, PREREG.md >= 0.40): Qwen 0.806, Grani
 - **H1b (spoken-form value gap, value-heavy):** the CI excludes 0 for both models, by a wide
   margin (-61 to -65 points). This part stands so far.
 - The Hindi BFCL gap differs a lot by model (-37 vs -18); its explanation is H2 (pending).
+
+### R9. Hindi diagnostic, field-aware rescoring and the Qwen-vs-Granite comparison (2026-10-30, exploratory)
+
+**Status: exploratory.** Rescoring uses the pre-registered rules with the provisional tau = 0.80
+and **no human audit yet**, so by PREREG.md none of this supports a claim. Rule amendment A1
+(transliteration across scripts only) was made before these numbers were used; earlier rescored
+numbers that were looser on same-script names are superseded.
+
+**1. Where the Hindi string mismatches come from** (BFCL-Hi, single-call tasks, all seeds,
+classified by the field classes in `harness/rescore.py`):
+
+| Kind | Qwen3.5-4B | Granite-4.0-micro |
+|---|---|---|
+| Devanagari kept, free text | 38 | 33 |
+| Devanagari kept, identifier | 5 | 5 |
+| Devanagari kept, name | 1 | 8 |
+| other mismatch (Latin), identifier | 7 | 14 |
+| other mismatch (Latin), name | 15 | 14 |
+| other mismatch (Latin), free text | 0 | 3 |
+| **total string mismatches** | 66 | 77 |
+| **share: Devanagari kept in free text** | **58%** | **43%** |
+
+Qwen's share is higher, but not clearly: 38/66 vs 33/77 gives chi-square 3.08 (below 3.84), and
+trials of the same task are not independent, so the real uncertainty is larger. Qwen makes fewer
+mismatches overall; Granite makes more Latin-script errors (identifiers 14, names 14).
+
+**2. Field-aware rescored pass^4** (points; set never pooled):
+
+| Set | Language | Qwen raw to rescored | Granite raw to rescored | Rescored minus raw (both models) |
+|---|---|---|---|---|
+| BFCL | English | 80.6 to 82.3 | 66.1 to 67.7 | +1.6 [0.0, +4.8] |
+| BFCL | Hindi | 43.5 to 50.0 | 48.4 to 54.8 | **+6.5 [+1.6, +12.9]** |
+| BFCL | Hinglish | 71.9 to 73.7 | 63.2 to 63.2 | +1.8 [0.0, +5.3] Qwen; 0.0 Granite |
+| value-heavy | all three | unchanged | unchanged | 0.0 |
+
+Rescoring moves 24 (Qwen) and 25 (Granite) of 1,000 trials. The Hindi BFCL gain is the same
++6.5 [+1.6, +12.9] for both models (the same 4 tasks flip).
+
+**3. The Hindi-minus-English BFCL gap, raw vs rescored** (paired on the 62 matched pairs):
+
+| Model | Raw | Rescored | Share of gap that remains |
+|---|---|---|---|
+| Qwen3.5-4B | -37.1 [-51.6, -22.6] | -32.3 [-45.2, -19.4] | 87% |
+| Granite-4.0-micro | -17.7 [-32.3, -3.2] | -12.9 [-27.4, +1.6] | 73% |
+
+Against H2: "largely a scoring artifact" needs <= 50% remaining on at least two qualifying models
+(and a passed audit): **not met** (87% and 73%). "Persists" needs a CI excluding 0 and >= 10
+points on two models: met for Qwen, not for Granite (its rescored CI includes 0). So: **partly
+explained (about 13-27%), not largely**; undecided pending more models and the audit.
+
+**4. Qwen minus Granite, paired on the same tasks** (points):
+
+| Set | Language | Tasks | Raw | Rescored |
+|---|---|---|---|---|
+| BFCL | English | 62 | +14.5 [+3.2, +25.8] | +14.5 [+3.2, +25.8] |
+| BFCL | Hindi | 62 | **-4.8 [-14.5, +4.8]** | **-4.8 [-14.5, +4.8]** |
+| BFCL | Hinglish | 57 | +8.8 [-3.5, +21.1] | +10.5 [-1.8, +22.8] |
+| value-heavy | English / Hindi / Hinglish | 23 | +4.3 / 0.0 / 0.0 (CIs +-9 to +-20) | same |
+
+On Hindi, Granite is nominally ahead of Qwen (the reverse of English), but the interval
+includes 0 and **rescoring does not change it**: the sign is the same and the CI still includes
+zero. **No ranking flip on these two models** (H3 not met, and the audit is not done). Phi-4-mini
+and Llama will show whether any ordering change appears.
 
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 

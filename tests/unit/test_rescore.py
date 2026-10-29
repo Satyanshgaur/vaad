@@ -74,6 +74,8 @@ def test_names_accept_transliteration_but_not_different_names() -> None:
     assert names_equal("बोस्टन", "Boston")
     assert names_equal("boston", "Boston")
     assert not names_equal("मुंबई", "Delhi")
+    assert not names_equal("Rutherford, NJ", "Rutherford")  # same script: format error
+    assert not names_equal("Corte Madera", "Corte Madera, CA")
     assert phonetic_key("") == ""
 
 
