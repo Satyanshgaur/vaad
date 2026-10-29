@@ -255,8 +255,9 @@ Indic-calibrated quant has been compared with the standard one on dev.
 Run in this order, on dev only, thresholds fixed beforehand:
 - [x] Paired pass^4 English vs Hinglish on matched tasks (`harness/compare.py`): existing runs
       are inconclusive on 18 pairs; see RESULTS R6b
-- [ ] Raw dev runs on the current dev set: Qwen3.5-4B, Granite-4.0-micro, Phi-4-mini,
-      Llama-3.2-3B (all Q4_K_M), then H1 and H1b
+- [x] Raw dev runs on the current dev set: Qwen3.5-4B, Granite-4.0-micro, Phi-4-mini (0 tool
+      calls: template mismatch), Llama-3.2-3B (below floor); third family Ministral-3-3B added
+      by amendment A2 and queued. H1 inconclusive until it runs; H1b stands (RESULTS R10)
 - [ ] Field-aware rescoring of BFCL-Hi (`harness/rescore.py`), human audit of about 50 cases
       (`private/review/rescore_audit.csv`), then H2 and H3
 - [ ] Qwen3.5-4B Q4_K_M and Q3_K_M built without an imatrix (`scripts/make_quants.sh`), H4

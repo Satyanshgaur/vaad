@@ -194,8 +194,8 @@ in-flight request appears twice in its gateway trace (1001 lines).
 
 Raw condition (no gateway, no system prompt), Q4_K_M, current 250-task dev set, 4 seeds,
 temperature 0.7, thinking off for Qwen. Reports `harness/reports/f1-<model>-Q4_K_M/raw`.
-Decision rules: PREREG.md. Finished so far: Qwen3.5-4B, Granite-4.0-micro. Still running or
-queued: Phi-4-mini, Llama-3.2-3B, the no-imatrix Q4_K_M and Q3_K_M, Qwen3.5-0.8B.
+Decision rules: PREREG.md. Finished: Qwen3.5-4B, Granite-4.0-micro, Phi-4-mini, Llama-3.2-3B, no-imatrix Q4_K_M
+(R10). Running or queued: no-imatrix Q3_K_M, Qwen3.5-0.8B, Ministral-3-3B (A2).
 
 Per set, never pooled (pass^4 in points, mean [95% CI over tasks]; `python -m harness.breakdown`):
 
@@ -297,6 +297,50 @@ On Hindi, Granite is nominally ahead of Qwen (the reverse of English), but the i
 includes 0 and **rescoring does not change it**: the sign is the same and the CI still includes
 zero. **No ranking flip on these two models** (H3 not met, and the audit is not done). Phi-4-mini
 and Llama will show whether any ordering change appears.
+
+### R10. The other raw runs: Phi-4-mini, Llama-3.2-3B, no-imatrix Qwen Q4_K_M (2026-10-30)
+
+Same protocol. pass^4 per set in points (CI over tasks in `harness.breakdown`/`compare`):
+
+| Set | Language | Tasks | Qwen 4B (unsloth Q4) | Granite | Phi-4-mini | Llama-3.2-3B | Qwen 4B, our no-imatrix Q4 |
+|---|---|---|---|---|---|---|---|
+| BFCL | English | 62 | 80.6 | 66.1 | 14.5 | 30.6 | 66.1 |
+| BFCL | Hindi | 62 | 43.5 | 48.4 | 14.5 | 14.5 | 37.1 |
+| BFCL | Hinglish | 57 | 71.9 | 63.2 | 10.5 | 31.6 | 61.4 |
+| value-heavy | English | 23 | 87.0 | 82.6 | 8.7 | 17.4 | 87.0 |
+| value-heavy | Hindi | 23 | 43.5 | 43.5 | 8.7 | 4.3 | 47.8 |
+| value-heavy | Hinglish | 23 | 21.7 | 21.7 | 8.7 | 0.0 | 13.0 |
+
+- **Phi-4-mini: setup failure, not a result.** It made **0 tool calls in 880 trials that expected
+  one**; its "correct" trials are the 120 where no call was right. Its embedded chat template takes
+  tools as a field on the system message and never sees OpenAI-style `tools`. Excluded as
+  non-qualifying (PREREG A2). Schema-valid reads 100% only because it never calls anything.
+- **Llama-3.2-3B** is below the pre-registered floor (English BFCL pass^4 0.33 < 0.40): only 45% of
+  its calls are schema-valid, as in G0.
+- **Qualifying families so far: 2 (Qwen3.5-4B, Granite-4.0-micro).** The no-imatrix Qwen is the same
+  family. Ministral-3-3B-Instruct-2512 was added as the third family by amendment A2 and is queued.
+
+**H1 / H1b on all five models** (paired pass^4 difference, second language minus English):
+
+| Model | English BFCL floor | BFCL Hinglish - English (57) | CI excludes 0? | Value-heavy Hinglish - English (23) |
+|---|---|---|---|---|
+| Qwen3.5-4B | 0.807 (qualifies) | -8.8 [-19.3, +1.8] | no | -65.2 [-82.6, -43.5] |
+| Granite-4.0-micro | 0.684 (qualifies) | -5.3 [-17.5, +5.3] | no | -60.9 [-78.3, -39.1] |
+| Qwen no-imatrix Q4 | 0.649 (same family) | -3.5 [-15.8, +8.8] | no | -73.9 [-91.3, -56.5] |
+| Llama-3.2-3B | 0.333 (below floor) | -1.8 [-10.5, +7.0] | no | -17.4 [-34.8, -4.3] |
+| Phi-4-mini | 0.105 (below floor) | 0.0 (no calls) | n/a | n/a |
+
+Reading against the pre-registered rules: **H1 would be "does not stand"** (two qualifying
+families both include 0) but needs three qualifying models, so it is **inconclusive until
+Ministral is in**. **H1b (spoken-form values) stands** for every model that can call tools at all
+(Llama's is smaller because it is weak everywhere).
+
+**Compression, exploratory (Qwen3.5-4B Q4_K_M, no imatrix minus the unsloth imatrix file), paired
+pass^4:** BFCL English **-14.5 [-24.2, -6.5]**, Hindi -6.5 [-14.5, +1.6], Hinglish -10.5 [-22.8,
+0.0]; value-heavy English 0.0, Hindi +4.3 [-8.7, +17.4], Hinglish -8.7 [-21.7, 0.0]. pass@1 is
+nearly unchanged (English 0.826 vs 0.856), so the loss is **consistency**, in English as much as
+in Hindi. Dropping the imatrix at the same bit width costs more than going from 8-bit to 4-bit
+did at G0. H4 itself (Q3 vs this Q4) waits for the Q3_K_M run.
 
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
