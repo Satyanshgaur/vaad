@@ -14,7 +14,7 @@ import yaml
 from harness.schema import ExpectedCall, Message, Task
 
 LANGS = ("en", "hi", "hinglish")
-PROVENANCE = "vaad value-heavy set; AI-drafted 2026-10-24, not yet native-speaker checked"
+PROVENANCE = "vaad value-heavy set; AI-drafted 2026-10-24"
 
 
 def _tool(name: str, spec: dict[str, Any]) -> dict[str, Any]:
@@ -23,6 +23,10 @@ def _tool(name: str, spec: dict[str, Any]) -> dict[str, Any]:
 
 def build(source: dict[str, Any]) -> list[Task]:
     tools = source["tools"]
+    checked_by = source.get("checked_by", [])
+    provenance = PROVENANCE + (
+        "" if source.get("native_checked") else ", not yet native-speaker checked"
+    )
     tasks = []
     for sc in source["scenarios"]:
         expected = [ExpectedCall.model_validate(e) for e in sc["expected"]]
@@ -43,7 +47,8 @@ def build(source: dict[str, Any]) -> list[Task]:
                     expected_calls=expected,
                     value_fields=value_fields,
                     ref_date=source["ref_date"],
-                    provenance=PROVENANCE,
+                    provenance=provenance,
+                    checked_by=checked_by,
                 )
             )
     return tasks

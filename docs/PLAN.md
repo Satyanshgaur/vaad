@@ -101,7 +101,7 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
       and Q4_K_M, plus **Qwen3.5-0.8B** Q8_0 for the CI smoke gate. Files in `~/models/`
 - [x] Qwen3.5-4B emits native tool calls via `scripts/llama_server.sh` (`--jinja`)
 - [x] Llama-3.2-3B emits native tool calls (but often malformed; see the G0 grid)
-- [ ] Same check for Qwen3.5-0.8B (needed for gate 9 in Phase 1)
+- [x] Qwen3.5-0.8B Q8_0 emits native tool calls too (English and Hinglish weather query, valid JSON args)
 - [x] Record the GGUF files and SHA256 hashes in `harness/models.yaml`
 - [x] Time one call and fill in the budget above (2.69 s: no fallback needed)
 
@@ -111,10 +111,15 @@ brief assumed 3 s/call, ~24k calls and ~20 h. This is under the 6 s fallback thr
 - [x] `bfcl_en`: paired Gorilla BFCL v4 live originals. Licence is **Apache-2.0**. Both
       languages use BFCL-Hi's (v2) functions and answers; pairs whose answer changed in v4
       are dropped
-- [x] `bfcl_hinglish`: first 50 rewrites (AI-drafted, **not yet native-speaker checked**)
-- [ ] Reach 150 Hinglish rewrites by Week 3 (adding tasks needs a deliberate re-lock)
+- [x] `bfcl_hinglish`: first 89 rewrites (AI-drafted, then reviewed by a native Hindi speaker
+      and an AI pass, 2026-10-29; 9 fixes applied)
+- [x] Hinglish grown to 140 rewrites (57 dev, 83 test). The last 51, all in test, were drafted
+      by Claude on 2026-10-29 and had only an AI pass, so they are marked `native_checked: false`
+      (CSV for reviewers: `private/review/hinglish_rewrites_batch3.csv`). 4 test tasks with
+      non-English originals (Korean, Thai, Chinese, one meta-prompt) have no Hinglish version,
+      so 150 is not reached.
 - [x] `value_heavy`: 50 scenarios × 3 languages, 11 tools, including 3 `clarify` scenarios
-      where asking back is the only correct answer (AI-drafted, not yet checked)
+      where asking back is the only correct answer (AI-drafted, then native-reviewed by a Hindi speaker, 2026-10-29; 11 fixes applied, "kal" trap in statement-01 kept)
 - [x] Splits frozen in `harness/tasks/SPLITS.lock`: 211 dev / 286 test tasks (one BFCL pair dropped
       from test because its question repeats a dev task). Rebuilding from
       pinned upstream revisions reproduces them byte-for-byte (`harness/tasks/README.md`)

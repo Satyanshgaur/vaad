@@ -11,11 +11,11 @@
       "tasks": 62
     },
     "dev/bfcl_hinglish.jsonl": {
-      "sha256": "8ff5a44b1e3efdebefb2dc8ab27aa8b2846bc70324824750e05e34d97dc449c8",
-      "tasks": 18
+      "sha256": "4c6bf9e2af9d212dd842f6c1247f3f2587fcf4e9e8d97af3adccd356b813753f",
+      "tasks": 57
     },
     "dev/value_heavy.jsonl": {
-      "sha256": "01642dbb034e42dfa8182ec2325f292ff4546742b187af3e2c10109903b414ba",
+      "sha256": "014e94980d96b59d4e66602b03d7d4e1e86ac98f632fe3483a80bd6282f275ee",
       "tasks": 69
     },
     "test/bfcl_en.jsonl": {
@@ -27,11 +27,11 @@
       "tasks": 87
     },
     "test/bfcl_hinglish.jsonl": {
-      "sha256": "c3774851149777b31b02fbab0e2fc9a73db3fad925f25ee6521d885e9728a79c",
-      "tasks": 32
+      "sha256": "ad8284bab47206b2f05bc16c6ed79222aead3f35d48b088506f4f333e1168c1e",
+      "tasks": 83
     },
     "test/value_heavy.jsonl": {
-      "sha256": "59a29076a92f36a8567e19dc7dd7aeda9715e353bf83d9f79fb842131a2408b9",
+      "sha256": "30575bc94463e4452f5ff86c3bad0e7847b1240da22a9d1fe6af8fe4e2993b99",
       "tasks": 81
     }
   }

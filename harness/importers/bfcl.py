@@ -151,7 +151,12 @@ def sample(pairs: dict[str, list[tuple[Task, Task]]], seed: int = SEED) -> list[
     return chosen
 
 
-def hinglish_tasks(en_tasks: list[Task], rewrites: dict[str, str]) -> list[Task]:
+def hinglish_tasks(
+    en_tasks: list[Task],
+    rewrites: dict[str, str],
+    checked_by: list[str] | None = None,
+    native_checked: bool = False,
+) -> list[Task]:
     """Hinglish versions of the English tasks that have a rewrite, same tools and answers."""
     by_pair = {t.pair_id: t for t in en_tasks}
     missing = rewrites.keys() - by_pair.keys()
@@ -164,8 +169,9 @@ def hinglish_tasks(en_tasks: list[Task], rewrites: dict[str, str]) -> list[Task]
                 "source": "bfcl_hinglish",
                 "lang": "hinglish",
                 "messages": [Message(role="user", content=text)],
-                "provenance": "Hinglish rewrite of BFCL v4 live (Apache-2.0); AI-drafted, "
-                "not yet native-speaker checked",
+                "provenance": "Hinglish rewrite of BFCL v4 live (Apache-2.0); AI-drafted"
+                + ("" if native_checked else ", not yet native-speaker checked"),
+                "checked_by": list(checked_by or []),
             }
         )
         for pair_id, text in rewrites.items()
@@ -190,8 +196,18 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(f"wrote {len(chosen)} tasks to {path}")
     if args.hinglish:
-        rewrites = yaml.safe_load(args.hinglish.read_text(encoding="utf-8"))["tasks"]
-        tasks = hinglish_tasks([pair[1] for pair in chosen], rewrites)
+        source = yaml.safe_load(args.hinglish.read_text(encoding="utf-8"))
+        en_tasks = [pair[1] for pair in chosen]
+        tasks = hinglish_tasks(
+            en_tasks,
+            source["tasks"],
+            source.get("checked_by"),
+            source.get("native_checked", False),
+        )
+        # Later batches that only an AI pass has seen; never claim a native check for them.
+        tasks += hinglish_tasks(
+            en_tasks, source.get("tasks_ai_only", {}), source.get("ai_only_checked_by")
+        )
         path = args.out_dir / "bfcl_hinglish.jsonl"
         path.write_text(
             "".join(t.model_dump_json(exclude_none=True) + "\n" for t in tasks), encoding="utf-8"
