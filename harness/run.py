@@ -23,6 +23,7 @@ from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
 from harness.metrics import bootstrap_ci, per_task_scores, percentile
+from harness.preprocess import romanize_task, translate_tasks
 from harness.schema import Task, ToolCall, TrialResult, load_tasks
 from harness.score import calls_match
 
@@ -248,10 +249,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--temperature", type=float, default=TEMPERATURE)
     parser.add_argument("--limit", type=int, help="first N tasks only (timing, smoke)")
     parser.add_argument("--resume", action="store_true", help="continue a partial run in --out")
+    parser.add_argument("--lang", nargs="+", help="only tasks in these languages")
+    parser.add_argument("--source", nargs="+", help="only tasks from these sources")
+    parser.add_argument(
+        "--preprocess",
+        choices=("none", "romanize", "translate"),
+        default="none",
+        help="H6 diagnostics: romanize the Devanagari, or translate the user turn first",
+    )
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
 
-    tasks = load_tasks(args.tasks)[: args.limit]
+    tasks = load_tasks(args.tasks)
+    if args.lang:
+        tasks = [t for t in tasks if t.lang in args.lang]
+    if args.source:
+        tasks = [t for t in tasks if t.source in args.source]
+    tasks = tasks[: args.limit]
     condition = Condition(
         model=args.model,
         quant=args.quant,
@@ -262,6 +276,17 @@ def main(argv: list[str] | None = None) -> int:
         else None,
         extra={"chat_template_kwargs": {"enable_thinking": False}} if args.no_think else {},
     )
+    args.out.mkdir(parents=True, exist_ok=True)
+    if args.preprocess == "romanize":
+        tasks = [romanize_task(t) for t in tasks]
+    elif args.preprocess == "translate":
+        tasks = translate_tasks(
+            tasks,
+            condition.base_url,
+            condition.model,
+            condition.extra,
+            args.out / "translations.json",
+        )
     results = run_grid(
         tasks, [condition], args.out, tuple(args.seeds), args.temperature, resume=args.resume
     )

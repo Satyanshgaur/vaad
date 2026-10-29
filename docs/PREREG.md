@@ -240,3 +240,20 @@ and the lexicons share an author. No canonicalizer gain on value-heavy counts as
 requires a new set written by native speakers who have not seen the lexicons or the trap list:
 fresh spoken-style requests with gold values, split into tuning and held-out halves, scored once.
 No author is assigned yet. **Real typed requests** (50-100) are likewise not collected yet.
+
+### A4 (2026-10-31, before reading any A3 result): lean run plan
+
+The A3 runs were estimated at about 5 GPU hours and only one part decides whether the
+canonicalizer is worth building. Scope cut, made **without having looked at any result** from the A3
+runs (the Qwen romanized-Hindi run had finished but was not opened):
+- **H7:** only the **worked-conversion prompt** is run, on value-heavy (69 tasks) and BFCL English
+  (62, the regression check), on all three qualifying models. The strong prompt is dropped: the
+  worked prompt contains it, so if the worked prompt cannot recover most of the gap the strong
+  prompt cannot either. BFCL Hinglish is dropped (H1 already failed there). The H7 rule is
+  unchanged. (The G0 strong-prompt result on the old dev set stays as background.)
+- **H6:** the script control (`hi-roman`) runs on Qwen (done) and Ministral (to test the
+  no-tool-call collapse); **translate-first** runs on Qwen only, on BFCL-Hi and value-heavy
+  Hindi and Hinglish (BFCL Hinglish dropped). Granite is not run for H6. The H6 rules need
+  "2 of 3 models", so with fewer models H6 can only be **reported descriptively**, not decided; a
+  decision needs Granite and Ministral to be added later.
+- H8 (calibration versus allocation) and the independent test set are unchanged.
