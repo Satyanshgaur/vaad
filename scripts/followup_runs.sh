@@ -4,6 +4,7 @@
 # downloading or being quantized.
 #   scripts/followup_runs.sh [name ...]      (default: all)
 set -euo pipefail
+source "$(dirname "$0")/lib_resilient.sh"
 MODELS="${MODELS_DIR:-$HOME/models}"
 PORT=8080
 # name quant file flags
@@ -26,13 +27,12 @@ for entry in "${GRID[@]}"; do
   if [ ${#want[@]} -gt 0 ] && [[ ! " ${want[*]} " =~ " $name " ]]; then continue; fi
   out="harness/reports/f1-${name}-${quant}/raw"
   [ -f "$out/summary.json" ] && { echo "skip $name $quant (done)"; continue; }
-  until [ -f "$MODELS/$file" ] && ! pgrep -f "hf download|llama-quantize" >/dev/null; do sleep 30; done
-  stop_server
+  until [ -f "$MODELS/$file" ] && ! pgrep -x llama-quantize >/dev/null; do sleep 30; done
   mkdir -p "$out"
-  "$(dirname "$0")/llama_server.sh" "$MODELS/$file" "$PORT" >"$(dirname "$out")/server.log" 2>&1 &
-  timeout 300 bash -c "until curl -sf localhost:$PORT/health >/dev/null; do sleep 2; done"
   echo "=== $name $quant ($(date +%T))"
   # shellcheck disable=SC2086
-  uv run python -m harness.run --tasks harness/tasks/dev --base-url "http://127.0.0.1:$PORT" \
+  run_resilient "ensure_llama '$MODELS/$file' $PORT '$(dirname "$out")/server.log'" -- \
+      --tasks harness/tasks/dev --base-url "http://127.0.0.1:$PORT" \
       --model "$name" --quant "$quant" $extra --out "$out"
+  stop_server
 done
