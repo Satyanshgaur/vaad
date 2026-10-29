@@ -131,6 +131,31 @@ Only 16 of the 57 dev BFCL-Hinglish tasks need a number, date or time value, and
 those use a spoken form: BFCL-Hinglish barely tests normalization. Value-heavy is the only set
 that does, and it was written adversarially (traps by design).
 
+## R6d. First look at field-aware rescoring (2026-10-30, exploratory, unaudited)
+
+`harness/rescore.py` with the pre-registered rules, bge-m3 embeddings, tau = 0.80 (the
+provisional value; the audit has not been done, so nothing here supports a claim). Applied to
+the Qwen3.5-4B Q4_K_M gateway run (`g1-strict`).
+
+- **50 of 1,000 trials changed** from wrong to right.
+- BFCL Hindi minus English: **-33.9 -> -32.3** points. BFCL Hinglish minus English: -12.3 ->
+  -15.8 (English gained a little too, since rescoring applies to every language). Value-heavy:
+  unchanged.
+- **Correction to R6c / earlier discussion:** the Devanagari free-text mismatches are real but
+  concentrated in about 7 of the 62 Hindi dev tasks (todo content, titles, alarm label, search
+  queries, news keyword), and several of those tasks also fail on other arguments. The answer-key
+  artifact explains **roughly a tenth of the Hindi gap, not most of it.** An earlier statement
+  that the gap was "mostly a scoring artifact" was wrong.
+- What the rest of the Hindi errors are (seed 0, single-call tasks): free text 12, identifier
+  11 (a Devanagari URL slug, a Devanagari track name inside a `track:... artist:...` query, a
+  wrong command, rating 5 vs 4.0, dict-shaped params), names 5 (`Rutherford, NJ` vs `Rutherford`,
+  a near-miss actor name, missing state). Not all of these are Hindi-specific.
+- **Classifier limit (pre-registered, so not changed after seeing this):** arrays of user
+  utterances with names like `faq_describe_telephone_banking_start` are classified as
+  identifiers, so a Hindi list where English was expected still scores wrong. The rules default
+  unplaceable fields to exact, so rescoring here *under*-counts the artifact. A looser classifier
+  can be reported as a clearly labelled exploratory variant, or added by a dated amendment.
+
 ## R7. G1 grammar ablation (strict vs loose date grammar)  *pending*
 
 Run: `scripts/grammar_ablation.sh strict loose` (Qwen3.5-4B Q4_K_M through the gateway, **current
