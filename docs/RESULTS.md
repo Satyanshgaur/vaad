@@ -375,6 +375,41 @@ Notes:
 - **Ministral's Hindi collapse** (BFCL Hindi 16.1 against 59.7 in English) is the largest
   Hindi gap of the three. Not diagnosed.
 
+### R12. H7: does a prompt close the spoken-value gap? (2026-10-31)
+
+Worked-conversion prompt (`harness/prompts/worked_conversions.txt`: the strong prompt plus a table
+of dedh / dhai / sava / saade / paune, lakh / crore, kal / parson by tense) against the raw model,
+Q4_K_M, dev set, 4 seeds. Value-heavy (23 scenarios per language) and BFCL English (62) only
+(PREREG A4). **The worked prompt overlaps the dev traps by design, so these numbers are an
+upper bound and circular; they cannot support a claim about a canonicalizer.** Reports
+`harness/reports/h67-<model>-worked`.
+
+| Model | Set | Raw pass^4 | Worked prompt | Paired change |
+|---|---|---|---|---|
+| Qwen3.5-4B | value-heavy Hinglish | 21.7 | 39.1 | **+17.4 [+4.3, +34.8]** |
+| Qwen3.5-4B | value-heavy Hindi | 43.5 | 52.2 | +8.7 [0.0, +21.7] |
+| Qwen3.5-4B | value-heavy English | 87.0 | 87.0 | 0.0 [-13.0, +13.0] |
+| Qwen3.5-4B | BFCL English | 80.6 | 77.4 | -3.2 [-9.7, +3.2] |
+| Granite-4.0-micro | value-heavy Hinglish | 21.7 | 26.1 | +4.3 [-13.0, +21.7] |
+| Granite-4.0-micro | value-heavy Hindi | 43.5 | 39.1 | -4.3 [-13.0, 0.0] |
+| Granite-4.0-micro | value-heavy English | 82.6 | 78.3 | -4.3 [-17.4, +8.7] |
+| Granite-4.0-micro | BFCL English | 66.1 | 56.5 | **-9.7 [-17.7, -3.2]** |
+| Ministral-3-3B | value-heavy Hinglish | 26.1 | 30.4 | +4.3 [-13.0, +21.7] |
+| Ministral-3-3B | value-heavy Hindi | 8.7 | 8.7 | 0.0 [-17.4, +17.4] |
+| Ministral-3-3B | value-heavy English | 78.3 | 91.3 | +13.0 [-4.3, +30.4] |
+| Ministral-3-3B | BFCL English | 59.7 | 53.2 | -6.5 [-14.5, +1.6] |
+
+Share of the raw Hinglish-vs-English value-heavy gap recovered: **Qwen 27%** (gap 65.2 points),
+**Granite 7%** (60.9), **Ministral 8%** (52.2).
+
+**Verdict (pre-registered rule: recovers >= 50% with the CI excluding 0 on >= 2 of 3 models, and
+BFCL English not regressing past -5): not met on every count.** Only Qwen's gain has a CI excluding
+0, and it recovers about a quarter. Even this ceiling leaves 61-73 points of the gap, and the
+prompt costs English BFCL 3-10 points (Granite's regression is clear). So **H1b is not a prompting
+problem for 3-4B models**; the canonicalizer's potential value is the full gap minus whatever
+translate-first achieves (H6, pending), not a small residual. Caveat: the prompt is one wording;
+a better prompt or few-shot examples inside the conversation were not tried.
+
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
 | Condition minus raw | English | Hindi | Hinglish |
