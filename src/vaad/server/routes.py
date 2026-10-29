@@ -18,6 +18,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.background import BackgroundTask
 
 from vaad.server.backend import BackendClient, BackendError, BackendResponse
+from vaad.server.pipeline import run_tool_pipeline
 from vaad.server.tracing import write_trace
 from vaad.types import Tier, Trace
 
@@ -101,29 +102,39 @@ async def chat_completions(request: Request) -> Response:
         )
 
     start = time.perf_counter()
+    trace = Trace(request_id=request_id, tier=Tier.SMALL)
+    use_pipeline = (
+        settings.gateway_enabled
+        and isinstance(payload.get("tools"), list)
+        and bool(payload["tools"])
+        and payload.get("tool_choice") != "none"
+        and isinstance(payload.get("messages"), list)
+    )
     try:
-        reply = await client.chat(raw, content_type, authorization)
+        if use_pipeline:
+            result = await run_tool_pipeline(
+                client, payload, settings.grammar, trace, content_type, authorization
+            )
+            reply = BackendResponse(result.status, result.body, result.content_type, 0.0)
+        else:
+            reply = await client.chat(raw, content_type, authorization)
+            trace.stage_ms["backend"] = reply.elapsed_ms
+            trace.raw_args = tool_calls_of(reply.body)
     except BackendError as exc:
         if settings.gateway_enabled and settings.trace_path:
-            write_trace(
-                Trace(request_id=request_id, tier=Tier.SMALL, status=exc.status, error=exc.code),
-                settings.trace_path,
-            )
+            trace.status, trace.error = exc.status, exc.code
+            write_trace(trace, settings.trace_path)
         return _error(exc.status, exc.code, exc.message, request_id)
 
     if settings.gateway_enabled and settings.trace_path:
-        trace = Trace(
-            request_id=request_id,
-            tier=Tier.SMALL,
-            raw_args=tool_calls_of(reply.body),
-            status=reply.status,
-            stage_ms={
-                "backend": round(reply.elapsed_ms, 3),
-                "total": round((time.perf_counter() - start) * 1000, 3),
-            },
-        )
+        trace.status = reply.status
+        trace.stage_ms = {k: round(v, 3) for k, v in trace.stage_ms.items()}
+        trace.stage_ms["total"] = round((time.perf_counter() - start) * 1000, 3)
         write_trace(trace, settings.trace_path)
-    return _relay(reply, request_id)
+    response = _relay(reply, request_id)
+    if trace.decision is not None:
+        response.headers["x-vaad-decision"] = trace.decision.value
+    return response
 
 
 @router.get("/models")

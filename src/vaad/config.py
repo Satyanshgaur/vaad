@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, Field, HttpUrl
@@ -29,12 +30,23 @@ class Thresholds(BaseModel):
     retry: float = 0.6
 
 
+class GrammarSettings(BaseModel):
+    """Schema tightening and repair. The switches double as the Phase 1 ablations."""
+
+    enabled: bool = True
+    date_grammar: Literal["strict", "loose"] = "strict"
+    infer_enums: bool = True
+    max_length: int = 512
+    retry: bool = True
+
+
 class Settings(BaseModel):
     gateway_enabled: bool = True
     small: Backend
     strong: Backend | None = None
     routing: Routing = Routing()
     thresholds: Thresholds = Thresholds()
+    grammar: GrammarSettings = GrammarSettings()
     trace_path: Path | None = Path("traces/vaad.jsonl")
     # Per-tool overrides: {tool_name: {arg_name: value_type | "free_text"}}
     overrides: dict[str, dict[str, str]] = {}

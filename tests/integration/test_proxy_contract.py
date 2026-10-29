@@ -176,7 +176,9 @@ def test_one_trace_line_per_request_when_enabled(tmp_path: Path) -> None:
     assert record["raw_args"] == [
         {"name": "get_weather", "arguments": {"city": "Pune", "unit": "celsius"}}
     ]
-    assert set(record["stage_ms"]) == {"backend", "total"}
+    assert set(record["stage_ms"]) == {"backend", "validate", "total"}
+    assert record["decision"] == "pass"
+    assert record["retried"] is False
 
 
 @pytest.mark.integration

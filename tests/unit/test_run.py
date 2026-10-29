@@ -129,3 +129,28 @@ def test_other_server_errors_still_abort() -> None:
     )
     with httpx.Client() as client, pytest.raises(httpx.HTTPStatusError):
         run_trial(client, TASK, COND, seed=0, temperature=0.7)
+
+
+@pytest.mark.unit
+def test_gateway_flag_is_recorded_and_executes_nothing() -> None:
+    flagged = {
+        "choices": [
+            {
+                "message": {
+                    "role": "assistant",
+                    "content": "kya aap date bata sakte hain?",
+                    "vaad_flag": {"reason": "invalid_arguments"},
+                }
+            }
+        ]
+    }
+    with respx.mock:
+        respx.post("http://backend/v1/chat/completions").mock(
+            return_value=httpx.Response(200, json=flagged)
+        )
+        with httpx.Client() as client:
+            result, _ = run_trial(client, TASK, COND, seed=0, temperature=0.0)
+    assert result.flagged
+    assert not result.correct  # a call was expected, so asking back is not a pass
+    assert not result.wrong_value
+    assert summarize([result], [TASK], k=1)["m:Q4_K_M:off|hinglish"]["flag_rate"][0] == 1.0
