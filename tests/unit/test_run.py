@@ -154,3 +154,38 @@ def test_gateway_flag_is_recorded_and_executes_nothing() -> None:
     assert not result.correct  # a call was expected, so asking back is not a pass
     assert not result.wrong_value
     assert summarize([result], [TASK], k=1)["m:Q4_K_M:off|hinglish"]["flag_rate"][0] == 1.0
+
+
+@pytest.mark.unit
+def test_resume_skips_finished_trials_and_keeps_them(tmp_path: Any) -> None:
+    from harness.run import run_grid
+
+    reply = {
+        "choices": [
+            {
+                "message": {
+                    "tool_calls": [
+                        {
+                            "function": {
+                                "name": "ship_order",
+                                "arguments": json.dumps({"date": "2026-10-25", "weight_kg": 2}),
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+    with respx.mock:
+        route = respx.post("http://backend/v1/chat/completions").mock(
+            return_value=httpx.Response(200, json=reply)
+        )
+        first = run_grid([TASK], [COND], tmp_path, seeds=(0, 1), temperature=0.0)
+        assert len(first) == 2 and route.call_count == 2
+        # a crash after seed 0 only: drop the last line, then resume
+        path = tmp_path / "results.jsonl"
+        path.write_text(path.read_text(encoding="utf-8").splitlines()[0] + "\n", encoding="utf-8")
+        resumed = run_grid([TASK], [COND], tmp_path, seeds=(0, 1), temperature=0.0, resume=True)
+    assert route.call_count == 3  # only the missing trial ran again
+    assert sorted(r.seed for r in resumed) == [0, 1]
+    assert len(path.read_text(encoding="utf-8").splitlines()) == 2

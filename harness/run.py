@@ -168,17 +168,31 @@ def run_grid(
     seeds: tuple[int, ...] = SEEDS,
     temperature: float = TEMPERATURE,
     timeout_s: float = 300.0,
+    resume: bool = False,
 ) -> list[TrialResult]:
+    """Run every task x seed x condition. With ``resume``, trials already in ``results.jsonl``
+    are kept and skipped, so a run killed part-way (a crashed llama-server) can continue."""
     (out_dir / "traces").mkdir(parents=True, exist_ok=True)
+    results_path = out_dir / "results.jsonl"
     results: list[TrialResult] = []
+    if resume and results_path.exists():
+        results = [
+            TrialResult.model_validate_json(line)
+            for line in results_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+    done = {(r.task_id, r.condition, r.seed) for r in results}
+    mode = "a" if resume else "w"
     with (
         httpx.Client(timeout=timeout_s) as client,
-        (out_dir / "results.jsonl").open("w", encoding="utf-8") as results_file,
-        (out_dir / "traces" / "responses.jsonl").open("w", encoding="utf-8") as traces_file,
+        results_path.open(mode, encoding="utf-8") as results_file,
+        (out_dir / "traces" / "responses.jsonl").open(mode, encoding="utf-8") as traces_file,
     ):
         for cond in conditions:
             for i, task in enumerate(tasks):
                 for seed in seeds:
+                    if (task.id, cond.name, seed) in done:
+                        continue
                     result, raw = run_trial(client, task, cond, seed, temperature)
                     results.append(result)
                     results_file.write(result.model_dump_json() + "\n")
@@ -233,6 +247,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--seeds", type=int, nargs="+", default=list(SEEDS))
     parser.add_argument("--temperature", type=float, default=TEMPERATURE)
     parser.add_argument("--limit", type=int, help="first N tasks only (timing, smoke)")
+    parser.add_argument("--resume", action="store_true", help="continue a partial run in --out")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
 
@@ -247,7 +262,9 @@ def main(argv: list[str] | None = None) -> int:
         else None,
         extra={"chat_template_kwargs": {"enable_thinking": False}} if args.no_think else {},
     )
-    results = run_grid(tasks, [condition], args.out, tuple(args.seeds), args.temperature)
+    results = run_grid(
+        tasks, [condition], args.out, tuple(args.seeds), args.temperature, resume=args.resume
+    )
     summary = summarize(results, tasks, k=len(args.seeds))
     meta = {"temperature": args.temperature, "seeds": args.seeds, "tasks": str(args.tasks)}
     (args.out / "summary.json").write_text(
