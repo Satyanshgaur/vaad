@@ -262,3 +262,9 @@ runs (the Qwen romanized-Hindi run had finished but was not opened):
 Worked-conversion prompt, three families: recovers 27% (Qwen, CI excludes 0), 7% (Granite) and 8%
 (Ministral) of the value-heavy Hinglish gap, with English BFCL changing by -3.2, -9.7 and -6.5.
 **Not met** (RESULTS R12). The canonicalizer's value is not reduced to a residual by prompting.
+
+### Outcome of H6 (2026-10-31, descriptive: fewer than 3 models by A4)
+Script control: romanizing Hindi **hurts** Qwen (-19 and -26 points, CIs exclude 0) and leaves
+Ministral unchanged, so the Hindi gap is not a script/tokenization problem. Translate-first (Qwen
+only) closes 26% (BFCL-Hi) and 40% (value-heavy Hindi) of the Hindi gap and 7% of the Hinglish
+spoken-value gap: "closes most" is **not met** on any set. RESULTS R13.
