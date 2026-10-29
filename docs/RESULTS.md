@@ -156,17 +156,42 @@ the Qwen3.5-4B Q4_K_M gateway run (`g1-strict`).
   unplaceable fields to exact, so rescoring here *under*-counts the artifact. A looser classifier
   can be reported as a clearly labelled exploratory variant, or added by a dated amendment.
 
-## R7. G1 grammar ablation (strict vs loose date grammar)  *pending*
+## R7. G1 grammar ablation: strict vs loose date grammar (2026-10-30)
 
-Run: `scripts/grammar_ablation.sh strict loose` (Qwen3.5-4B Q4_K_M through the gateway, **current
-250-task dev set**, 4 seeds). Reports: `harness/reports/g1-strict`, `g1-loose`. These are not
-comparable to R1 until the raw baseline is re-run on the current dev set. To fill in:
+Qwen3.5-4B Q4_K_M through the gateway (schema tightening, validation, one retry) on the
+**current 250-task dev set**, 4 seeds, temperature 0.7, thinking off. Reports:
+`harness/reports/g1-strict`, `g1-loose` (results, summary, gateway trace). The loose run was
+interrupted twice by out-of-memory kills of llama-server and finished with `--resume`; one
+in-flight request appears twice in its gateway trace (1001 lines).
 
-| Condition | Language | pass^4 | Schema-valid | Wrong-value | Flag rate |
-|---|---|---|---|---|---|
-| raw (current dev) | | | | | |
-| grammar-strict | | | | | |
-| grammar-loose | | | | | |
+| Language (tasks) | Grammar | pass@1 | pass^4 | Schema-valid | Wrong-value | Flag rate |
+|---|---|---|---|---|---|---|
+| English (85) | strict | 0.829 | 0.788 [0.69, 0.87] | 100% | 9.1% | 1.2% |
+| English (85) | loose | 0.826 | 0.788 [0.69, 0.87] | 100% | 9.1% | 1.2% |
+| Hindi (85) | strict | 0.500 | 0.424 [0.32, 0.53] | 100% | 33.8% | 2.4% |
+| Hindi (85) | loose | 0.491 | 0.388 [0.28, 0.49] | 100% | 34.4% | 2.4% |
+| Hinglish (80) | strict | 0.631 | 0.525 [0.41, 0.64] | 100% | 25.9% | 1.3% |
+| Hinglish (80) | loose | 0.641 | 0.550 [0.44, 0.66] | 100% | 25.6% | 1.3% |
 
-G1 exit: schema-valid at least 99% with grammar on; passthrough identical to raw (tested by
-gate 7); gates 1-9 live in CI.
+- **Strict vs loose: no detectable difference.** Paired loose-minus-strict pass^4: English 0.0
+  [0.0, 0.0], Hindi -3.5 [-8.2, 0.0], Hinglish +2.5 [-2.5, +7.5]. The default stays `strict`
+  because nothing favours loose. The predicted "strict grammar forces a confident wrong date"
+  effect is not visible at this size, probably because few tasks have a date to get wrong
+  (most Hinglish wrong values are numbers and times, R6c).
+- **Schema validity is 100%** in both (a flagged reply counts as valid; flags are 1-2%), above
+  the 99% G1 target. The G0 raw runs were about 95% (old dev set).
+- **Retries:** per 1,000 requests, 32-35 were retried; 16 recovered and 16 ended as flags in
+  both runs; 115-116 were plain text answers with no call.
+- **No accuracy gain is claimed.** The raw baseline on this dev set is R8 (next); G0 numbers
+  were on the 211-task dev set and cannot be compared. The wrong-value rate (26-34% for
+  Hindi/Hinglish) is untouched by grammar and repair, as expected: the grammar makes values
+  well-formed, not right.
+- **G1 exit:** schema-valid >= 99% (met, 100%); passthrough identical to the raw backend (met,
+  gate 7 tests); the CI gates that exist at this phase (1, 2, 3, 7, 9, 10, split lock) run on
+  every PR (gates 4, 5, 6 and 8 belong to Phase 2).
+
+## R8. Raw baseline on the current dev set, and the model comparison  *pending*
+
+Filled in as the pre-registered runs finish (`harness/reports/f1-*`): Qwen3.5-4B, Granite-4.0-
+micro, Phi-4-mini, Llama-3.2-3B (Q4_K_M), then the no-imatrix Q4_K_M and Q3_K_M and the 0.8B
+model. Decision rules: PREREG.md.

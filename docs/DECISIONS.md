@@ -81,6 +81,9 @@ reviewer asks "why did you...", the answer should be here.
 - **Cap llama-server's prompt cache at 2048 MiB** (2026-10-30) after two out-of-memory kills
   of long runs; recorded in REPRODUCE.md because earlier runs used the 8192 MiB default.
 
+- **Strict date grammar stays the default** (2026-10-30): G1 showed no difference between strict
+  and loose (RESULTS R7), so there is no reason to give up the guaranteed ISO format.
+
 ## Process
 
 - One change per PR with a conventional-commit title; squash-free merge commits.
