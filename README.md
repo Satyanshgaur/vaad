@@ -12,9 +12,11 @@ back, and canonicalizes Hinglish values (numbers, lakh/crore, relative dates, ti
 units) into the format each tool expects. An uncertain value is never silently executed: it is
 retried once or returned to the user as a question.
 
-**Status:** pre-alpha, Phase 0 (setup and baseline). Nothing here works end to end yet.
-See [docs/PLAN.md](docs/PLAN.md) for the roadmap and [docs/brief.md](docs/brief.md) for the
-design.
+**Status:** pre-alpha, Phase 1 (proxy and grammar layer done; the canonicalizer is Phase 2).
+The gateway is a working OpenAI-compatible proxy with schema tightening, validation, one
+guided retry and a clarification flag, but it does not normalize Hinglish values yet. The
+baseline and the datasets are in. See [docs/](docs/README.md) for the plan, results, methods,
+data, architecture and decisions.
 
 ## Development
 
