@@ -14,13 +14,18 @@ not any one artifact.
 
 | # | Claim | Evidence needed | Status |
 |---|---|---|---|
-| C1 | Compression hurts Hindi/Hinglish tool-call reliability more than English | grid with intervals, 2+ model families | **Not supported** at 3-4B (R3). Report as an analysis. Needs the Phase 3 controlled std-vs-Indic imatrix quants to say anything about calibration |
+| C1 | Compression hurts Hindi/Hinglish tool-call reliability more than English | grid with intervals, 2+ model families | **Not supported** at 3-4B: Q8 vs Q4 (R3, two families) and Q4 vs Q3 without imatrix (R11, one model). Separate finding: dropping the imatrix at Q4 cost 14.5 points of English BFCL pass^4 (R10). Needs Phase 3's controlled std-vs-Indic imatrix quants |
 | C2 | Schema-aware, confidence-gated canonicalization recovers most of the gap, beating prompting, grammar alone and blind retry | ablations on the **test** split, run once | open (Phase 2-4). Baselines so far: raw, strong prompt (R1, R2). Grammar-only and retry in progress (R7) |
 | C3 | Resources: BFCL-Hinglish, value-heavy set, canonicalization gold set | datasheets, native-speaker agreement on a sample | datasets exist and are native-reviewed (one reviewer per set); gold set not started; agreement not measured |
 | C4 | Analyses: when grammar constraints hurt; how "kal" is resolved; whether Indic calibration helps | per-field-type breakdowns | one early observation of the strict-grammar confident-wrong date (R6); rest open |
 
-New finding to lead with (measured, R1): **English 0.82 vs Hinglish 0.34 pass^4**, with about a
-third of Hindi/Hinglish calls executing with a wrong value, at about 95% schema validity.
+**What can be claimed so far (R11, three qualifying families):** spoken-form values (numbers,
+times, relative dates) cost 52-65 points of pass^4 against English on value-heavy for every
+tool-calling model, while natural Hinglish BFCL rewrites are **not** significantly less consistent
+than English (pre-registered H1 fails). The earlier headline (English 0.82 vs Hinglish 0.34) came
+from a 41-task Hinglish set that was mostly value-heavy and must not be quoted as a general gap.
+The Hindi BFCL gap is large (-18 to -44 points) and only about 13-27% of it is the free-text
+answer-key artifact (exploratory, audit pending).
 
 ## Tables and figures (source files)
 

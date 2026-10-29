@@ -342,6 +342,39 @@ nearly unchanged (English 0.826 vs 0.856), so the loss is **consistency**, in En
 in Hindi. Dropping the imatrix at the same bit width costs more than going from 8-bit to 4-bit
 did at G0. H4 itself (Q3 vs this Q4) waits for the Q3_K_M run.
 
+### R11. Pre-registered verdicts (2026-10-30)
+
+All eight raw runs are complete (Qwen3.5-4B, Granite-4.0-micro, Ministral-3-3B, Llama-3.2-3B,
+Phi-4-mini, Qwen no-imatrix Q4_K_M and Q3_K_M, Qwen3.5-0.8B), dev set, 4 seeds. Three independent
+families qualify (English BFCL pass^4 >= 0.40): Qwen3.5-4B 0.807, Granite-4.0-micro 0.684,
+Ministral-3-3B 0.597. Rescored numbers below are exploratory until the human audit exists.
+
+Ministral-3-3B (new), pass^4 per set: BFCL English 59.7 [48, 73], Hindi 16.1 [8, 26], Hinglish 52.6
+[40, 65]; value-heavy English 78.3 [61, 96], Hindi 8.7 [0, 22], Hinglish 26.1 [9, 43]. It calls a tool
+in 85% of the trials that need one; schema-valid 98.6%.
+
+| Hypothesis | Rule (PREREG.md) | Result | Verdict |
+|---|---|---|---|
+| **H1** natural-Hinglish consistency gap | CI of BFCL Hinglish minus English excludes 0 on >= 2 of 3 qualifying | Qwen -8.8 [-19.3, +1.8]; Granite -5.3 [-17.5, +5.3]; Ministral -7.0 [-19.3, +5.3]: all three include 0 | **Does not stand** |
+| **H1b** spoken-value gap (value-heavy, 23 scenarios) | same rule | Qwen -65.2 [-82.6, -43.5]; Granite -60.9 [-78.3, -39.1]; Ministral -52.2 [-73.9, -30.4]: all three exclude 0 | **Stands** |
+| **H2** Hindi gap is an answer-key artifact | <= 50% of the gap remains on >= 2 models, audit passed | 87% (Qwen), 73% (Granite), 104% (Ministral) remain | **Not met** (and the audit is not done) |
+| H2 alternative: gap persists | CI excludes 0 and >= 10 points on >= 2 models, after rescoring | Qwen -32.3 [-45.2, -19.4] yes; Ministral -45.2 [-58.1, -32.3] yes; Granite -12.9 [-27.4, +1.6] no | Persists on 2 of 3 (exploratory) |
+| **H3** ranking change under rescoring | a pairwise flip with the rescored CI excluding 0, audit passed | Hindi order is the same before and after: Granite 48.4 / 54.8, Qwen 43.5 / 50.0, Ministral 16.1 / 16.1; Qwen minus Granite -4.8 [-14.5, +4.8] in both | **Not met** |
+| **H4** compression hurts Hindi/Hinglish more at Q3 | CI of (D_lang - D_en) excludes 0, positive, >= 5 points | D_en +2.4, D_hi +3.5, D_hinglish -6.2; D_hinglish - D_en -8.6 [-22.0, +4.6]; D_hi - D_en +1.2 [-10.6, +12.9] | **C1 not supported at Q3** (one model) |
+| H5 0.8B (descriptive) | no hypothesis | BFCL English 35.5, Hindi 12.9, Hinglish 15.8; value-heavy English 43.5, Hindi 4.3, Hinglish 13.0; calls a tool in 71% of needed trials; schema-valid 97.4% | usable but weak |
+
+Notes:
+- **H4 detail** (our no-imatrix Qwen3.5-4B, Q3_K_M minus Q4_K_M, pass^4 per set): BFCL English -3.2
+  [-14.5, +8.1], Hindi -4.8 [-16.1, +6.5], Hinglish +5.3 [-8.8, +19.3]; value-heavy English 0.0, Hindi
+  0.0 [-13.0, +13.0], Hinglish +8.7 [0.0, +21.7]. Going from Q4 to Q3 without an imatrix costs
+  almost nothing in any language here, while dropping the imatrix at Q4 cost 14.5 points of
+  English BFCL (R10). Calibration, not bit width, is what matters at this scale (one model; an
+  imatrix-vs-no-imatrix pair at Q3 was not run).
+- **H2/H3** numbers use tau = 0.80 (provisional) and amendment A1; the audit sheet is the next
+  step before any of them can support a claim.
+- **Ministral's Hindi collapse** (BFCL Hindi 16.1 against 59.7 in English) is the largest
+  Hindi gap of the three. Not diagnosed.
+
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
 | Condition minus raw | English | Hindi | Hinglish |

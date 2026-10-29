@@ -52,6 +52,13 @@ models:
     quants:
       Q4_K_M: {file: qwen3.5-4b-noimat/Qwen3.5-4B-Q4_K_M-noimat.gguf, sha256: 14a328657cee35fa0b31ab7035a37f42e6bf41754a7b72a7410c236ef9bcb7e4}
       Q3_K_M: {file: qwen3.5-4b-noimat/Qwen3.5-4B-Q3_K_M-noimat.gguf, sha256: e89beebdc36bdee404af041ebb2cad82c740f353c170909ad5257276a05bf1b2}
+  - name: ministral-3-3b
+    hf_repo: mistralai/Ministral-3-3B-Instruct-2512-GGUF
+    base_model: mistralai/Ministral-3-3B-Instruct-2512
+    license: apache-2.0
+    role: third qualifying family (3B), added by PREREG amendment A2
+    quants:
+      Q4_K_M: {file: ministral-3-3b/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf, sha256: 9ed150d4367e68df0ac8e1540f6ddc65b42d0ee26378329d1ecbca60f93fc5f8}
   - name: bge-m3
     hf_repo: ggml-org/bge-m3-Q8_0-GGUF
     base_model: BAAI/bge-m3

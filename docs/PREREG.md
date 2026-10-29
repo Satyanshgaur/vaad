@@ -162,3 +162,18 @@ qualification rule whatever it scores; if it also falls below the floor, H1-H3 s
 inconclusive and are reported that way. Phi-4-mini and Llama are reported as non-qualifying.
 No other rule changes. A fourth candidate, if this one fails to produce tool calls, is
 SmolLM3-3B (Apache-2.0).
+
+## Outcome (2026-10-30)
+
+Recorded after all runs finished; the verdict table with numbers is RESULTS R11.
+- H1: **does not stand** (all three qualifying families include 0).
+- H1b: **stands** (all three exclude 0, -52 to -65 points).
+- H2: "largely an artifact" **not met** (73-104% of the gap remains); exploratory, audit pending.
+- H3: **not met** (no ordering flip).
+- H4: **C1 not supported at Q3** for the one model tested.
+- H5: descriptive only.
+
+Per "What each outcome means": H1 does not stand and H1b stands, so natural Hinglish is not less
+consistent than English at this scale, and spoken-form values are the problem. The project narrows
+to spoken numbers, dates and times; the canonicalizer is kept; the resource (C3) and the targeted
+method lead.

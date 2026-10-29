@@ -84,6 +84,14 @@ reviewer asks "why did you...", the answer should be here.
 - **Strict date grammar stays the default** (2026-10-30): G1 showed no difference between strict
   and loose (RESULTS R7), so there is no reason to give up the guaranteed ISO format.
 
+- **Narrow the project to spoken-form values** (2026-10-30), following the pre-registered
+  outcome: natural Hinglish BFCL is not less consistent than English on three families (H1), but
+  value-heavy shows a 52-65 point gap on every tool-calling model (H1b). Phase 2 builds the
+  canonicalizer for numbers, money, dates, times, phones and units; the "Hinglish tool calling is
+  broken" framing is dropped. Compression (C1) is reported as not supported at Q3/Q4 for one model.
+- **Excluded Phi-4-mini** as a setup failure and added Ministral-3-3B as the third family by
+  dated amendment A2 before running it.
+
 ## Process
 
 - One change per PR with a conventional-commit title; squash-free merge commits.

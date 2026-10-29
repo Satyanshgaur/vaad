@@ -258,10 +258,14 @@ Run in this order, on dev only, thresholds fixed beforehand:
 - [x] Raw dev runs on the current dev set: Qwen3.5-4B, Granite-4.0-micro, Phi-4-mini (0 tool
       calls: template mismatch), Llama-3.2-3B (below floor); third family Ministral-3-3B added
       by amendment A2 and queued. H1 inconclusive until it runs; H1b stands (RESULTS R10)
-- [ ] Field-aware rescoring of BFCL-Hi (`harness/rescore.py`), human audit of about 50 cases
-      (`private/review/rescore_audit.csv`), then H2 and H3
-- [ ] Qwen3.5-4B Q4_K_M and Q3_K_M built without an imatrix (`scripts/make_quants.sh`), H4
-- [ ] Qwen3.5-0.8B on the full dev set, H5 (descriptive)
+- [x] Field-aware rescoring of BFCL-Hi (`harness/rescore.py`): done, exploratory. Human audit of
+      about 50 cases (`private/review/rescore_audit.csv`) still to do before H2/H3 can support a claim
+- [x] Qwen3.5-4B Q4_K_M and Q3_K_M built without an imatrix (`scripts/make_quants.sh`), H4: C1 not
+      supported at Q3
+- [x] Qwen3.5-0.8B on the full dev set, H5 (descriptive)
+
+**Outcome:** H1 does not stand, H1b stands (RESULTS R11, PREREG outcome). Phase 2 goes ahead
+narrowed to spoken numbers, dates and times.
 
 Deferred to v2: multi-turn tasks; voice clips and real Hinglish requests (Sarvam/Gnani);
 models above 4B; quants below Q3.
