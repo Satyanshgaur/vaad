@@ -92,6 +92,10 @@ reviewer asks "why did you...", the answer should be here.
 - **Excluded Phi-4-mini** as a setup failure and added Ministral-3-3B as the third family by
   dated amendment A2 before running it.
 
+- **Reposition around the voice layer, cut Phase 3** (2026-10-31): see PLAN "Revised plan" and
+  PRODUCT.md. The ASR engines' own number normalization is the main threat to the voice pitch and
+  is tested first. Decision gates were written before the data exists.
+
 ## Process
 
 - One change per PR with a conventional-commit title; squash-free merge commits.

@@ -184,6 +184,49 @@ least 99% with grammar on, and gates 1–9 run in CI.
 passes; the gates that exist at this phase run in CI). No accuracy gain from grammar and retry
 alone: see RESULTS R7. Strict stays the default.
 
+## Revised plan (2026-10-31): what the Phase 1 follow-up results change
+
+Evidence: RESULTS R9-R14; market view and voice strategy in [PRODUCT.md](PRODUCT.md).
+The project is now **spoken-value grounding** (numbers, money, fractions, times, relative dates,
+phones, units; Roman and Devanagari; with abstention), delivered as a small library plus a voice
+middleware, with the gateway as a thin wrapper. Hindi (Devanagari) understanding is out of scope.
+
+**Cut:** Phase 3 (Indic quants, router). Calibration and Indic calibration were not shown (R14),
+and nothing suggests routing is needed. Kaggle notebook (c) goes with it.
+
+**Evidence track (runs in parallel with Phase 2; each item blocks a later claim):**
+- [ ] **ASR-output test (decides the voice pitch):** about 300 spoken utterances from the
+      value-heavy templates, several native speakers, through Sarvam Saaras v3 (transcribe,
+      verbatim, codemix), Gnani Vachana and Whisper; count unresolved spoken values reaching the LLM.
+      Needs a Sarvam key and 3-5 speakers.
+- [ ] **Independent held-out set:** native speakers who have not seen the lexicons say requests in
+      their own words, with their own gold values; split into tuning and held-out halves; scored
+      once. Blocks every canonicalizer claim. No author assigned yet.
+- [ ] **Real typed requests:** 50-200 consented messages; measure how often spoken-form values
+      appear. No collection started.
+- [ ] **Bigger models:** value-heavy on one 8-9B local model and one hosted model, to see whether
+      the gap is a small-model problem.
+- [ ] **Rescoring audit:** 52 rows in `private/review/rescore_audit.csv`; needs a native reviewer.
+- [ ] Literature/prior-art check against indic-punct, NeMo-text-processing, hindi-normalize,
+      dateparser and in-house voice-app code (PRODUCT.md section 2) before any novelty claim.
+
+**Decision gates (written before the data exists):**
+- **Proceed to the full product** if spoken-form values reach the LLM in >= 10% of voice requests
+  after the ASR's own ITN, or >= 3% of typed requests, **and** the normalizer gains >= 25 points
+  on the held-out set for a 3-4B model **and** an 8-9B model does not already pass value-heavy
+  Hinglish (>= 80%).
+- **Reposition as benchmark and paper only** if real requests rarely contain such values, or a
+  mainstream ASR plus a bigger model already clears them.
+- **Voice sub-gate:** if Sarvam Saaras v3 transcribe mode resolves >= 90% of the utterances
+  (fractions, times, relative dates included), the voice pitch becomes open-source/on-device ASR,
+  verbatim-mode compliance and the abstention/audit guarantee, not "fixes the ASR output".
+
+**Phase 2 additions:** the three integration arms from one parser core (pre-annotate, post-verify,
+both), measured on dev only and frozen before any held-out or test scoring; the Pipecat and LiveKit
+middleware and a high-value read-back guard; a demo whose failure is visible. **Phase 4/5
+additions:** the voice benchmark, the design-partner pilots, and the artifacts (dataset, benchmark,
+preprint, demo, blog) which the author reviews before anything is published.
+
 ## Phase 2: Canonicalizer (Weeks 4–5, ~35 h) → G2
 
 **Week 4: numbers, money, units, phones**
@@ -215,7 +258,7 @@ alone: see RESULTS R7. Strict stays the default.
 worse, the wrong-value rate falls, and there are 300+ golden cases. Email the closest authors
 once this passes.
 
-## Phase 3: Router and quants (Week 6, ~17 h) → G3
+## Phase 3: Router and quants (Week 6, ~17 h) → G3  (CUT 2026-10-31, see the revised plan)
 
 - [ ] `router/langid.py`: Devanagari script ratio plus a Hinglish word-list score. Returns
       en, hi or hinglish with a confidence, in under 1 ms
