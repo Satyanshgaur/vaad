@@ -81,6 +81,13 @@ answer-key artifact (exploratory, audit pending).
 
 ## Related work to position against (from the brief; verify before claiming novelty)
 
+Added 2026-10-31 (prior art for the normalizer, PRODUCT.md section 2): indic-punct (arXiv 2203.16825,
+WFST ITN for 11 Indic languages); NVIDIA NeMo-text-processing (Hindi row; coverage unverified);
+kenpath/indic-text-normalization; the `hindi-normalize` library (Devanagari number words only);
+Sarvam Saaras v3 and Sarvam Edge (ASR with built-in number normalization); `dateparser` (Hindi
+support). Positioning: none of these documents Roman-script fractions, colloquial times,
+tense-aware relative dates, abstention or tool-schema verification, but a vendor may do it privately.
+
 - Luo et al., *Lost in Execution* (multilingual tool calling at full precision)
 - BFCL-Hi (NVIDIA) and the Berkeley Function-Calling Leaderboard (Gorilla)
 - KiranaBench, hinglish-caller-bench, QuantClaw
