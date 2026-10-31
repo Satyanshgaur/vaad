@@ -10,6 +10,8 @@ Start here. Everything needed to understand, reproduce and write up the project.
 | [METHODS.md](METHODS.md) | Exact metric, scoring and statistics definitions; conditions; launch target. |
 | [DATA.md](DATA.md) | Datasets, licences, how rewrites were written and reviewed, splits, test-split handling, limitations. |
 | [PRODUCT.md](PRODUCT.md) | The product, existing solutions, market fit, voice strategy, marketing and risks. |
+| [OPEN_DATA.md](OPEN_DATA.md) | Existing open datasets, what the counts say, free gold for "kal", what still needs collecting. |
+| [DATA_COLLECTION.md](DATA_COLLECTION.md) | Protocol, consent and formats for the data that does not exist openly. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | What the gateway does today: pipeline, schema rules, config, errors, trace, CI gates. |
 | [DECISIONS.md](DECISIONS.md) | Why each choice was made. |
 | [REPRODUCE.md](REPRODUCE.md) | Environment and commands to reproduce every result. |

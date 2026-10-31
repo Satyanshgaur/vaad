@@ -195,6 +195,10 @@ middleware, with the gateway as a thin wrapper. Hindi (Devanagari) understanding
 and nothing suggests routing is needed. Kaggle notebook (c) goes with it.
 
 **Evidence track (runs in parallel with Phase 2; each item blocks a later claim):**
+- [x] **Open data first (2026-10-31, OPEN_DATA.md):** MASSIVE hi-IN gives 1,073 time-slot, 2,563
+      date-slot and 410 "kal" utterances with English-parallel gold; prevalence of dedh/sava/lakh words
+      is rare in general text (fractions 0.2%, lakh/crore/sau 0.8% of assistant commands). Collection
+      floors shrink to 100 typed and 120 spoken, money/delivery/measure focused.
 - [ ] **ASR-output test (decides the voice pitch):** about 300 spoken utterances from the
       value-heavy templates, several native speakers, through Sarvam Saaras v3 (transcribe,
       verbatim, codemix), Gnani Vachana and Whisper; count unresolved spoken values reaching the LLM.
