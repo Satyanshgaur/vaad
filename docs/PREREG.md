@@ -318,3 +318,8 @@ contain a spoken-form number word (descriptive; it is small), wrong-value and fl
 **Stated expectation:** spoken-form numbers are about 9% of these messages (R16, R17), so the overall effect should
 be small; "no detectable effect" is the likely outcome and would calibrate the claim, not refute it. If the effect
 sits only on that subset, that is the honest size of the product's value on typed text.
+
+
+**A6 outcome (2026-10-31, RESULTS R20):** helps on 3 of 3 models (annotate - off: +22.2, +19.0, +16.4 pass^4
+points, all CIs above 0). The expectation of "no detectable effect" was wrong; the gain is mostly dates and times,
+not spoken numbers. Subset analysis not run. Caveats in R20.
