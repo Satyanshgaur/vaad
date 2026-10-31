@@ -208,8 +208,9 @@ and nothing suggests routing is needed. Kaggle notebook (c) goes with it.
       once. Blocks every canonicalizer claim. No author assigned yet.
 - [x] **Typed requests, first batch:** 224 messages from 8 writers (RESULTS R16). Spoken-form number words
       in 8.9% of messages, highly writer-dependent (one writer 12 of 28, seven writers 0-4 of 28); digits
-      in 80%. Used as development data. **Still needed:** a fresh batch from new writers as the held-out
-      half, and real (not card-driven) messages.
+      in 80%. Used as development data. A second batch of 196 messages from 7 new writers was scored
+      once as the held-out check (RESULTS R17): the parsers find 90-100% of the card values, matching
+      development. **Still needed:** real (not card-driven) messages and the voice recordings.
 - [ ] **Bigger models:** value-heavy on one 8-9B local model and one hosted model, to see whether
       the gap is a small-model problem.
 - [ ] **Rescoring audit:** 52 rows in `private/review/rescore_audit.csv`; needs a native reviewer.
