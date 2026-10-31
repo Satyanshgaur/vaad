@@ -90,12 +90,14 @@ def test_day_offsets(ref: date, n: int, direction: str) -> None:
 @pytest.mark.property
 @settings(max_examples=300, deadline=None)
 @given(REFS, st.integers(1, 28), st.integers(1, 12))
-def test_day_and_month_look_forward(ref: date, day: int, month: int) -> None:
-    got = parse_date(f"{day} {MONTHS[month - 1]}", ref)
-    assert got is not None
-    resolved = date.fromisoformat(got.value)
-    assert (resolved.month, resolved.day) == (month, day)
-    assert resolved >= ref  # no year given and no past cue: the next occurrence
+def test_day_and_month_pick_the_nearest_or_the_cued_year(ref: date, day: int, month: int) -> None:
+    plain = parse_date(f"{day} {MONTHS[month - 1]}", ref)
+    ahead = parse_date(f"{day} {MONTHS[month - 1]} ko bhej do", ref)
+    assert plain is not None and ahead is not None
+    p, a = date.fromisoformat(plain.value), date.fromisoformat(ahead.value)
+    assert (p.month, p.day) == (month, day) and (a.month, a.day) == (month, day)
+    assert abs((p - ref).days) <= 183  # no cue: the nearest occurrence
+    assert a >= ref  # a future cue: the next occurrence
 
 
 @pytest.mark.property

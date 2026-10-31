@@ -138,6 +138,11 @@ def _year_for(day: int, month: int, ref: date, sign: int) -> date | None:
         return _valid(ref.year + 1, month, day)
     if sign < 0 and this > ref:
         return _valid(ref.year - 1, month, day)
+    if sign == 0:  # direction unknown: the nearest occurrence, past or future
+        options = [
+            d for y in (ref.year - 1, ref.year, ref.year + 1) if (d := _valid(y, month, day))
+        ]
+        return min(options, key=lambda d: abs((d - ref).days))
     return this
 
 
@@ -214,7 +219,6 @@ def _month_dates(
             continue
         sign, _, _ = _direction(tokens, i, end_index, field, lex)
         assumed = sign == 0
-        sign = sign or 1
         year = _find_year(tokens, end_index + 1)
         if year:
             d = _valid(year[0], month, day[0])
@@ -246,6 +250,18 @@ def find_dates(text: str, ref_date: date, field: str | None = None) -> list[Date
         if token.kind != "word" or not free(token.start, token.end):
             continue
         word = token.norm
+        nxt1 = tokens[i + 1].norm if i + 1 < len(tokens) else ""
+        nxt2 = tokens[i + 2].norm if i + 2 < len(tokens) else ""
+        if word == "day" and nxt1 in ("after", "before") and nxt2 in ("tomorrow", "yesterday"):
+            offset = 2 if nxt1 == "after" else -2
+            when = (ref_date + timedelta(days=offset)).isoformat()
+            out.append(DateMatch(when, token.start, tokens[i + 2].end, 0.95, f"day {nxt1} {nxt2}"))
+            taken.append((token.start, tokens[i + 2].end))
+            continue
+        if word in lex.fixed_days:
+            when = (ref_date + timedelta(days=lex.fixed_days[word])).isoformat()
+            out.append(DateMatch(when, token.start, token.end, 0.95, word))
+            continue
         if word in lex.relative_days:
             offset = lex.relative_days[word]
             if offset == 0:
@@ -257,6 +273,12 @@ def find_dates(text: str, ref_date: date, field: str | None = None) -> list[Date
             wd = lex.weekdays[word]
             prev = tokens[i - 1].norm if i > 0 else ""
             start = token.start
+            if prev in lex.this_words and prev not in lex.next_words:
+                d = _next_weekday(ref_date, wd, 1, False)
+                out.append(
+                    DateMatch(d.isoformat(), tokens[i - 1].start, token.end, 0.85, "this weekday")
+                )
+                continue
             if prev in lex.next_words:
                 out.append(
                     DateMatch(
@@ -296,6 +318,7 @@ def find_dates(text: str, ref_date: date, field: str | None = None) -> list[Date
             )
     out += _offset_dates(text, tokens, ref_date, lex, free)
     out += _tarikh(text, tokens, ref_date, explicit_sign, lex, free)
+    out += _ordinals(tokens, ref_date, lex, free)
     # overlapping readings of the same words ("March 12 March"): keep the stronger one
     out.sort(key=lambda m: (m.start, -m.confidence, -(m.end - m.start)))
     kept: list[DateMatch] = []
@@ -336,6 +359,40 @@ def _offset_dates(
         out.append(
             DateMatch(d.isoformat(), m.start, end, 0.9, f"{int(m.value)} {unit} {direction}")
         )
+    return out
+
+
+def _ordinals(
+    tokens: list[Token], ref: date, lex: TimeDateLexicon, free: Callable[[int, int], bool]
+) -> list[DateMatch]:
+    """ "28th", "3rd ko": that day of this month, or of the next if it has passed."""
+    out: list[DateMatch] = []
+    for i, token in enumerate(tokens[:-1]):
+        nxt = tokens[i + 1]
+        if (
+            token.kind != "digits"
+            or nxt.start != token.end
+            or nxt.norm not in ("st", "nd", "rd", "th")
+        ):
+            continue
+        if (
+            not token.text.isdigit()
+            or not 1 <= int(token.text) <= 31
+            or not free(token.start, nxt.end)
+        ):
+            continue
+        day = int(token.text)
+        window = " ".join(t.norm for t in tokens[max(0, i - 3) : i + 5])
+        this_month = any(w in window.split() for w in ("month", "mahine", "महीने")) and any(
+            w in window.split() for w in lex.this_words
+        )
+        d = _valid(ref.year, ref.month, day)
+        if d is not None and d < ref and not this_month:
+            d = _valid(ref.year + (ref.month == 12), ref.month % 12 + 1, day)
+        if d is not None:
+            out.append(
+                DateMatch(d.isoformat(), token.start, nxt.end, 0.7, "day of month (month assumed)")
+            )
     return out
 
 

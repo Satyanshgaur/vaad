@@ -43,6 +43,8 @@ relative_days:
   परसों: 2
   narson: 3
   नरसों: 3
+fixed_days: {tomorrow: 1, tmrw: 1, yesterday: -1, today: 0, tonight: 0, tonite: 0}
+this_words: [this, is, iss, इस]
 next_words: [agle, agla, agli, next, आगामी, अगले, अगला, अगली]
 last_words: [pichhle, pichle, pichla, last, previous, पिछले, पिछला, पिछली, बीते]
 day_words: [din, dino, दिन]
