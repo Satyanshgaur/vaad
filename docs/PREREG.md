@@ -299,3 +299,22 @@ Primary mode `both`: recovers 87%, 114% and 100% of the value-heavy Hinglish gap
 met on 3 of 3 models); BFCL English change -4.8, -4.8 and -1.6 points with CI lower bounds -11.3, -11.3 and
 -8.1 (regression clause **fails on 3 of 3**). **H9 as written does not hold.** The `annotate`-only ablation
 satisfies every clause on 2 of 3 models (not pre-registered as primary). Dev, circular, optimistic: see RESULTS R19.
+
+### A6 (2026-10-31, before any run): does the normalizer help on human-written text?
+
+Calibrates H9, which was circular. Tasks: the **189 tasks built from the held-out typed batch** (7 writers who
+were not in the development batch, 27 cards each; gold from the cards; `harness/importers/typed.py`; the
+messages are private and were not read by the developer). Qwen3.5-4B, Granite-4.0-micro, Ministral-3-3B (Q4_K_M),
+4 seeds, temperature 0.7, through the gateway with grammar tightening off and the guided retry on, reference
+date 2026-10-31. Parsers: `main` at the merge commit of this amendment. Modes: `off`, `annotate`, `both`
+(`verify` alone is left out).
+
+**H10.** Primary: paired pass^4 of **`annotate` minus `off`**, on all 189 tasks, per model (`annotate` is named
+because the H9 ablation made it the lead; `both` is secondary). **The normalizer helps on human-written text**
+if the CI of the gain excludes 0 from above on >= 2 of 3 models; it **harms** if the CI excludes 0 from below on
+>= 2; otherwise **no detectable effect**. Also reported: the same paired change on the subset of messages that
+contain a spoken-form number word (descriptive; it is small), wrong-value and flag rates.
+
+**Stated expectation:** spoken-form numbers are about 9% of these messages (R16, R17), so the overall effect should
+be small; "no detectable effect" is the likely outcome and would calibrate the claim, not refute it. If the effect
+sits only on that subset, that is the honest size of the product's value on typed text.
