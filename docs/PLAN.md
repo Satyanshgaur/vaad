@@ -269,6 +269,11 @@ preprint, demo, blog) which the author reviews before anything is published.
 worse, the wrong-value rate falls, and there are 300+ golden cases. Email the closest authors
 once this passes.
 
+**H9 result (2026-10-31, RESULTS R19):** the normalizer recovers 87-114% of the spoken-value gap on all three
+models (annotate alone 87-107%), cutting silent wrong values from about half to about zero, at a cost of 1-5
+points of English BFCL and more questions. The pre-registered rule fails only on its English-regression clause.
+Next: the independent held-out set, and deciding between `annotate` and `both` on data that is not dev.
+
 ## Phase 3: Router and quants (Week 6, ~17 h) → G3  (CUT 2026-10-31, see the revised plan)
 
 - [ ] `router/langid.py`: Devanagari script ratio plus a Hinglish word-list score. Returns
