@@ -2,10 +2,11 @@
 
     uv run python scripts/calibration_card.py --typed PRIVATE.csv [--massive-partition test]
 
-Aggregates only: counts and rates, never message text. For a trustworthy "ask when unsure" layer, the
-confidence a parser reports has to mean something: outputs at >= 0.9 should be right about as often as the
-number says. Sources: MASSIVE hi-IN (public; "kal" direction and clock times, gold from the English
-parallel) and a private card-driven typed batch (gold from the cards, see eval_typed.py).
+Aggregates only: counts and rates, never message text. For a trustworthy "ask when unsure"
+layer, the confidence a parser reports has to mean something: outputs at >= 0.9 should be
+right about as often as the number says. Sources: MASSIVE hi-IN (public; "kal" direction and
+clock times, gold from the English parallel) and a private card-driven typed batch (gold from
+the cards, see eval_typed.py).
 """
 
 from __future__ import annotations
