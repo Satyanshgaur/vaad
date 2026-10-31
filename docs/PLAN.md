@@ -230,11 +230,12 @@ preprint, demo, blog) which the author reviews before anything is published.
 ## Phase 2: Canonicalizer (Weeks 4–5, ~35 h) → G2
 
 **Week 4: numbers, money, units, phones**
-- [ ] Lexicons (YAML, with provenance in each PR): number words in Hinglish and Devanagari,
+- [x] Lexicons (YAML, with provenance in each PR): number words in Hinglish and Devanagari (0-99,
+      multipliers, fractions, verb and follower cues; AI-written 2026-10-31, **not native-reviewed**),
       fractions (aadha, dedh, dhai, saade, sava, paune), lakh/crore, currency words, units
-- [ ] `numbers.py`, `money.py`, `units.py`, `phones.py`. Every parser returns
+- [x] `numbers.py`, `money.py` done; [ ] `units.py`, `phones.py` to do. Every parser returns
       `Canonicalized(value, confidence, source span, reason)`
-- [ ] Context handling for ambiguous words, e.g. "do" means *two* in "do kilo" but *give* in
+- [x] Context handling for ambiguous words, e.g. "do" means *two* in "do kilo" but *give* in
       "bhej do"
 - [ ] Use NeMo Hindi ITN as a reference or fallback for Devanagari spoken forms
 

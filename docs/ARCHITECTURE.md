@@ -121,7 +121,8 @@ The harness reads these files for per-stage analysis.
 |---|---|
 | `server/` (app, backend, routes, pipeline, tracing) | built, gate 7 |
 | `grammar/` (tighten, validate) | built |
-| `canon/` (numbers, money, units, phones, dates, times) | stubs, Phase 2; `decide.py` (confidence to pass/retry/flag) exists |
+| `canon/numbers.py`, `money.py`, `lexicon.py` | built (2026-10-31): number words (Roman and Devanagari), fractions, lakh/crore, `k`/`cr`, digits, rupee amounts; identifiers such as `OD4821` are never read as quantities; `find_numbers` returns spans and confidences |
+| `canon/` units, phones, dates, times | stubs, Phase 2; `decide.py` (confidence to pass/retry/flag) exists |
 | `router/` (langid, difficulty, policy) | stubs, Phase 3 |
 | `quants/` | Phase 3 |
 
@@ -132,9 +133,9 @@ The harness reads these files for per-stage analysis.
 | 1 | ruff lint and format | live |
 | 2 | mypy (strict on canon/, router/, grammar/) | live |
 | 3 | unit tests | live |
-| 4 | golden canonicalization cases | Phase 2 |
-| 5 | property tests (hypothesis) | Phase 2 |
-| 6 | no value invention (every output traces to a span or the reference date) | Phase 2 |
+| 4 | golden canonicalization cases (`tests/golden`, 155 so far) | live (numbers, money) |
+| 5 | property tests (hypothesis): spoken round trip, digits, free text untouched | live (numbers) |
+| 6 | no value invention (every output traces to a span or the reference date) | live (numbers: spans in range, ordered, idempotent) |
 | 7 | proxy contract with a mocked backend (`tests/integration`) | live |
 | 8 | latency budget (p95 < 20 ms per 1,000 canonicalizations) | Phase 2 |
 | 9 | smoke eval, 0.8B on CPU (`smoke.yml`) | live (about 5 minutes on GitHub) |
