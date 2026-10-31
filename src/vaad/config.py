@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Literal
 
 import yaml
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, field_validator
 
 
 class Backend(BaseModel):
@@ -48,6 +48,12 @@ class CanonSettings(BaseModel):
     mode: Literal["off", "annotate", "verify", "both"] = "off"
     ref_date: date | None = None  # today when None; fixed in evaluations
     ungrounded: Literal["ignore", "flag"] = "ignore"  # a typed value with no support in the turn
+
+    @field_validator("mode", mode="before")
+    @classmethod
+    def _yaml_off_is_false(cls, value: object) -> object:
+        # unquoted `mode: off` is the boolean False in YAML 1.1
+        return "off" if value is False else value
 
 
 class Settings(BaseModel):
