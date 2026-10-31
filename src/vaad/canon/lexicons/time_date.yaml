@@ -2,7 +2,7 @@
 # Provenance: written by Claude (AI assistant) from general knowledge on 2026-10-31; developed and
 # checked only against the MASSIVE hi-IN training partition (CC BY 4.0) and hand-made golden cases.
 # NOT native-reviewed. Direction cues are heuristics, not grammar: see docs/ARCHITECTURE.md.
-baje: [baje, bajke, bajey, bajkar, bajne, बजे, बजकर, बजने, बज]
+baje: [baje, bje, bjey, bajke, bajey, bajkar, bajne, बजे, बजकर, बजने, बज]
 fillers: [ko, ke, mein, me, tak, se, ki, ka, को, के, में, तक, से, की, का, aaj, आज]
 periods:
   morning: [subah, subha, savere, sabere, savera, सुबह, सवेरे, सवेरा, प्रातः]
@@ -14,9 +14,9 @@ hours: [ghanta, ghante, ghanta, hour, hours, hr, hrs, घंटा, घंटे
 months:
   1: [january, janwari, janvari, jan, जनवरी]
   2: [february, farwari, farvari, feb, फरवरी, फ़रवरी]
-  3: [march, maarch, mar, मार्च]
+  3: [march, maarch, मार्च]
   4: [april, aprail, apr, अप्रैल]
-  5: [may, mai, मई]
+  5: [may, मई]
   6: [june, joon, jun, जून]
   7: [july, julai, jul, जुलाई]
   8: [august, agast, aug, अगस्त]

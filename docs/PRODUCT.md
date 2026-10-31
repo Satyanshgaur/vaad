@@ -35,6 +35,14 @@ So the product is **spoken-value grounding**, not "Hinglish tool calling".
 schema-aware, tense-aware, never invents a value, and abstains. Not yet proven absent: proprietary
 platforms may already have it internally.
 
+## Evidence update (2026-10-31)
+
+Typed data now exists (RESULTS R16, R17): spoken-form number words are about 9% of card-driven messages, and
+consented private chats (not published) suggest they are much rarer in real friend chat, where the common
+problem is **ambiguity** (AM/PM, "kal" with no tense cue). The parsers flag that. This supports the
+voice-first pitch: typed Hinglish would mostly be an abstention layer, while spoken input is where number
+words appear.
+
 ## 3. Market and fit
 
 - **Size (noisy, vendor-sourced):** India voice recognition about $0.4-0.6B in 2025; conversational

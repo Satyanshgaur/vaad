@@ -23,6 +23,10 @@ _COLON = re.compile(
 _DOT_MARKED = re.compile(
     rf"(?<![\d:.])(?P<h>\d{{1,2}})\.(?P<m>\d{{2}})(?!\d)\s*(?:{_AMPM}|(?P<baje>baje|बजे))", re.I
 )
+_DOT_BARE = re.compile(
+    r"(?<![\d:.,/-])(?P<h>[1-9]|1[0-2])\.(?P<m>00|15|30|45)(?![\d.]|\s*(?:kg|km|mb|gb|rs|rupaye|per|%))",
+    re.I,
+)
 _HOUR_AMPM = re.compile(rf"(?<![\d:.])(?P<h>\d{{1,2}})\s*{_AMPM}(?![A-Za-z])", re.I)
 _AMPM_TAIL = re.compile(rf"\s*{_AMPM}(?![A-Za-z\u0900-\u097F])", re.I)
 _PERIOD_RADIUS = 3
@@ -217,7 +221,7 @@ def _word_clock(text: str, tokens: list[Token], lex: TimeDateLexicon) -> list[Ti
 
 def _numeric_clock(text: str, tokens: list[Token], lex: TimeDateLexicon) -> list[TimeMatch]:
     out: list[TimeMatch] = []
-    for pattern in (_COLON, _DOT_MARKED, _HOUR_AMPM):
+    for pattern in (_COLON, _DOT_MARKED, _HOUR_AMPM, _DOT_BARE):
         for m in pattern.finditer(text):
             groups = m.groupdict()
             minute = int(groups["m"]) if groups.get("m") else 0
@@ -269,6 +273,7 @@ def find_durations(text: str) -> list[DurationMatch]:
     lex = time_date_lexicon()
     tokens = tokenize(text)
     out: list[DurationMatch] = []
+    kinds: list[bool] = []  # True when the duration so far ends in an hours unit
     for m in find_numbers(text):
         nxt = _index_at(tokens, m.end)
         if nxt >= len(tokens):
@@ -281,9 +286,21 @@ def find_durations(text: str) -> list[DurationMatch]:
         else:
             continue
         value: int | float = int(minutes) if minutes == int(minutes) else minutes
-        out.append(
-            DurationMatch(value, m.start, tokens[nxt].end, m.confidence, f"{m.reason}; {unit}")
-        )
+        match = DurationMatch(value, m.start, tokens[nxt].end, m.confidence, f"{m.reason}; {unit}")
+        # "1 hr 20 min": an hours duration directly followed by a minutes one is one duration
+        if out and unit in lex.minutes and kinds[-1] and match.start - out[-1].end <= 2:
+            joined = out[-1].minutes + match.minutes
+            out[-1] = DurationMatch(
+                joined,
+                out[-1].start,
+                match.end,
+                min(out[-1].confidence, m.confidence),
+                "hours and minutes",
+            )
+            kinds[-1] = False
+            continue
+        out.append(match)
+        kinds.append(unit in lex.hours)
     return out
 
 
