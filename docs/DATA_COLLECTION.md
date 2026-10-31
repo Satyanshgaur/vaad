@@ -1,5 +1,12 @@
 # Collecting real requests and recordings
 
+> **Read [OPEN_DATA.md](OPEN_DATA.md) first.** Open datasets (MASSIVE, COMI-LINGUA, FLEURS) already
+> cover times, dates, the "kal" resolver and general prevalence, so the floors below are lower than
+> the original targets: **typed 100 messages from 5 people** and **120 utterances from 3 speakers**,
+> focused on money, delivery and measurement requests (where fractions and lakh/crore live).
+> The original targets (200 messages, 300 utterances) are still the better size if people are
+> available.
+
 Two datasets decide the product (PLAN.md, "Evidence track"): **typed messages** (how often spoken-form
 values appear in text chat at all) and **voice recordings** (what the ASR hands to the model, and
 the independent test set). Both are written or spoken by native speakers who have **not seen the
