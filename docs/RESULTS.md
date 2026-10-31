@@ -696,3 +696,33 @@ constraints hurt" risk in the brief's risk table. Possible causes (untested): th
 cap and inferred enums constraining generation, and the retry note sometimes steering the model
 away from a correct first call. The right response is to isolate the pieces in the Phase 2
 ablations, not to claim a gain from grammar.
+
+
+## R20. H10 (A6): the normalizer on held-out human-typed tasks (2026-10-31)
+
+189 held-out tasks from new writers (never read by the author), 4 seeds, temperature 0.7, grammar off, retry on,
+parsers frozen at `00ddf37`. Paired pass^4 against `off`, bootstrap CI over tasks. Aggregates only; the task text
+and per-writer results stay private.
+
+| Model | off pass^4 | annotate - off | both - off | wrong value off / annotate / both | flag rate both |
+|---|---|---|---|---|---|
+| Qwen3.5-4B | 0.466 | +22.2 [+16.4, +28.6] | +21.7 [+14.3, +29.1] | 23.1% / 13.5% / 6.6% | 6.7% |
+| Granite-4.0-micro | 0.471 | +19.0 [+13.2, +24.9] | +28.0 [+20.1, +36.5] | 41.8% / 26.9% / 9.4% | 7.9% |
+| Ministral-3-3B | 0.397 | +16.4 [+10.6, +22.8] | +11.6 [+5.3, +18.0] | 33.7% / 17.9% / 7.3% | 18.8% |
+
+**A6 rule: helps** (annotate CI excludes 0 from above on 3 of 3 models). The stated expectation, "no detectable
+effect", was wrong.
+
+How far to read it:
+- The effect is **not** only spoken-form numbers. Spoken-form numbers are ~9% of these messages, yet the gain is
+  16-22 points, so most of it comes from dates, clock times and unit/amount values that the annotation resolves
+  (AM/PM, "kal", "baje"). I did not run the spoken-form-only subset; it would need reading the text.
+- The tasks are card-driven: every message was written to contain a value the tools need. Real chat is far
+  sparser in such values (R19-era audit: spoken-form numbers 0.4% of real messages). This is the gain **when a
+  message carries a value**, not an average over everyday talk.
+- Parsers and lexicons were tuned on batch 1 (dev) with the same scenario cards, so the held-out writers are new
+  but the task design is shared. Optimistic by that much, unquantified.
+- `both` beats `annotate` on Granite, ties on Qwen, loses on Ministral (it asks on 18.8% of calls). `both` cuts
+  wrong values to 7-9% on all three, at the cost of flags. Which mode to ship is an application choice (ask vs
+  guess), not a result.
+- Not yet measured: spoken input through ASR, which is the product's actual premise.
