@@ -53,3 +53,13 @@ def test_validate_reports_errors() -> None:
 def test_decide_uses_weakest(confidences: list[float], expected: Decision) -> None:
     results = [Canonicalized(value=1, confidence=c, source=None, reason="") for c in confidences]
     assert decide(results, Thresholds()) is expected
+
+
+@pytest.mark.unit
+def test_unquoted_yaml_off_means_off() -> None:
+    import yaml
+
+    from vaad.config import CanonSettings
+
+    assert CanonSettings.model_validate(yaml.safe_load("mode: off")).mode == "off"
+    assert CanonSettings.model_validate(yaml.safe_load('mode: "both"')).mode == "both"

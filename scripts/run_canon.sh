@@ -23,7 +23,7 @@ for m in "${want[@]}"; do
 gateway_enabled: true
 small: {url: "http://127.0.0.1:8080", model: ${NAME[$m]}}
 grammar: {enabled: false, retry: true}
-canon: {mode: $mode, ref_date: "2026-10-24"}
+canon: {mode: "$mode", ref_date: "2026-10-24"}
 trace_path: $out/gateway-trace.jsonl
 EOF
     ensure_gateway() {
