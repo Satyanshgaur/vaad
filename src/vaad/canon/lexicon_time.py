@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
@@ -35,15 +36,19 @@ class TimeDateLexicon:
 
 
 def _set(data: dict[str, object], key: str) -> frozenset[str]:
-    return frozenset(str(w).lower() for w in data[key])  # type: ignore[attr-defined]
+    return frozenset(_nfc(w) for w in data[key])  # type: ignore[attr-defined]
+
+
+def _nfc(word: object) -> str:
+    return unicodedata.normalize("NFC", str(word).lower())
 
 
 @cache
 def time_date_lexicon() -> TimeDateLexicon:
     data = yaml.safe_load(_PATH.read_text(encoding="utf-8"))
-    periods = {str(w).lower(): cls for cls, words in data["periods"].items() for w in words}
-    months = {str(w).lower(): int(n) for n, words in data["months"].items() for w in words}
-    weekdays = {str(w).lower(): int(n) for n, words in data["weekdays"].items() for w in words}
+    periods = {_nfc(w): cls for cls, words in data["periods"].items() for w in words}
+    months = {_nfc(w): int(n) for n, words in data["months"].items() for w in words}
+    weekdays = {_nfc(w): int(n) for n, words in data["weekdays"].items() for w in words}
     return TimeDateLexicon(
         baje=_set(data, "baje"),
         fillers=_set(data, "fillers"),
@@ -52,7 +57,7 @@ def time_date_lexicon() -> TimeDateLexicon:
         hours=_set(data, "hours"),
         months=months,
         weekdays=weekdays,
-        relative_days={str(k).lower(): int(v) for k, v in data["relative_days"].items()},
+        relative_days={_nfc(k): int(v) for k, v in data["relative_days"].items()},
         next_words=_set(data, "next_words"),
         last_words=_set(data, "last_words"),
         day_words=_set(data, "day_words"),

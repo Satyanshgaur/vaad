@@ -274,3 +274,22 @@ Calibration, allocation and Indic-specific calibration effects are each **not si
 English (+4.8, +6.5 and +3.2 points, all CIs include 0); the total unsloth effect (+14.5 [+6.5,
 +24.2]) is roughly the sum of allocation and calibration and cannot be split with 62 tasks.
 "Indic calibration helps" is **not met** (best case BFCL Hinglish +7.0 [-1.8, +17.5]). RESULTS R14.
+
+### A5 (2026-10-31, before any canonicalizer run): does the normalizer close the spoken-value gap?
+
+Conditions (Qwen3.5-4B, Granite-4.0-micro, Ministral-3-3B; Q4_K_M; dev set, 4 seeds, temperature
+0.7; through the gateway with grammar tightening **off** and the guided retry **on**; reference
+date fixed at 2026-10-24): `canon.mode` = `off` (the control through the same gateway), `annotate`,
+`verify`, `both`. Tasks: value-heavy (69) and BFCL English (62, the regression check). Statistic:
+paired pass^4 of each mode minus `off`, per set and language.
+
+**H9. The normalizer recovers most of the spoken-value gap.** Primary mode: **`both`** (named before any
+result). Holds if, for value-heavy Hinglish, the paired gain over `off` is >= **50%** of the raw
+Hinglish-vs-English gap with the CI excluding 0 on **>= 2 of 3** models, and BFCL English does not
+regress (CI lower bound above -5 points). `annotate` and `verify` are reported as the ablation.
+Also reported: flag rate and wrong-value rate per mode.
+
+**Circularity (stated up front):** the value-heavy dev set and the lexicons share an author and the
+parsers were written knowing the trap list, so this is a **dev estimate and an optimistic ceiling**,
+not evidence. The claim requires the independent held-out set (PLAN, evidence track). The value-heavy
+test split is not touched here.
