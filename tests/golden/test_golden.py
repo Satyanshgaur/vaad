@@ -11,9 +11,15 @@ import yaml
 from vaad.canon.dates import parse_date
 from vaad.canon.money import parse_amount
 from vaad.canon.numbers import find_numbers, parse_number
+from vaad.canon.phones import parse_phone
 from vaad.canon.times import parse_duration, parse_time
+from vaad.canon.units import parse_quantity
 
-CASES = yaml.safe_load((Path(__file__).parent / "canon_cases.yaml").read_text("utf-8"))["cases"]
+CASES = [
+    case
+    for name in ("canon_cases.yaml", "canon_cases_ai.yaml")
+    for case in yaml.safe_load((Path(__file__).parent / name).read_text("utf-8"))["cases"]
+]
 
 
 def _id(case: dict[str, object]) -> str:
@@ -31,6 +37,22 @@ def test_golden(case: dict[str, object]) -> None:
         else:
             assert got is not None, f"{text!r} found no amount"
             assert got.value == pytest.approx(case["expected"])
+        return
+    if case["type"] in ("phone", "quantity"):
+        got = parse_phone(text) if case["type"] == "phone" else parse_quantity(text)
+        if case["expected"] in (None, "none"):
+            assert got is None, f"{text!r} should have no {case['type']}, got {got}"
+        elif case["expected"] == "ambiguous":
+            assert got is not None and got.confidence < 0.6, f"{text!r}: {got}"
+        else:
+            assert got is not None, f"{text!r} found no {case['type']}"
+            if case["type"] == "phone":
+                assert got.value == case["expected"], f"{text!r}: {got}"
+            else:
+                assert got.value["unit"] == case["expected"]["unit"], f"{text!r}: {got}"
+                assert got.value["value"] == pytest.approx(case["expected"]["value"]), (
+                    f"{text!r}: {got}"
+                )
         return
     if case["type"] in ("time", "duration", "date"):
         if case["type"] == "time":

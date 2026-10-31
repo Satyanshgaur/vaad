@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass
 
 _TOKEN = re.compile(
@@ -22,7 +23,8 @@ class Token:
 
     @property
     def norm(self) -> str:
-        return self.text.lower()
+        # NFC so that precomposed and decomposed nukta letters (ढ़) match the lexicon
+        return unicodedata.normalize("NFC", self.text.lower())
 
 
 def tokenize(text: str) -> list[Token]:

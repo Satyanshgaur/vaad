@@ -17,6 +17,9 @@ _AFTER = re.compile(
     r"रुपये|रुपए|रुपया|रु\.?|पैसे)(?![A-Za-zऀ-ॿ])",
     re.IGNORECASE,
 )
+_PAISE_TAIL = re.compile(
+    r"\s*(?P<n>[\w\u0900-\u097F ]{1,24}?)\s*(?:paise|paisa|पैसे)(?![\w\u0900-\u097F])", re.IGNORECASE
+)
 _BEFORE = re.compile(r"(?:₹|\brs\.?|\binr)\s*$", re.IGNORECASE)
 _PAISE = frozenset({"paise", "paisa", "पैसे"})
 
@@ -29,24 +32,42 @@ def _marker(text: str, match: NumberMatch) -> tuple[bool, bool]:
     return bool(_BEFORE.search(text[: match.start])), False
 
 
-def parse_amount(text: str, require_marker: bool = True) -> Canonicalized | None:
-    """The first amount in ``text``, in rupees. With ``require_marker`` False (the schema says the
-    field is an amount) the first number is returned with lower confidence."""
+def find_amounts(text: str, require_marker: bool = True) -> list[Canonicalized]:
+    """Every amount in ``text`` in rupees, left to right. With ``require_marker`` False a lone
+    unmarked number is also returned, at lower confidence."""
     matches = find_numbers(text)
+    out: list[Canonicalized] = []
     for m in matches:
         marked, paise = _marker(text, m)
-        if marked:
-            value = m.value / 100 if paise else m.value
-            end = m.end
-            after = _AFTER.match(text, m.end)
-            if after:
-                end = after.end()
-            return Canonicalized(
-                value, m.confidence, Span(m.start, end), f"{m.reason}; currency marker"
-            )
-    if not require_marker and matches:
-        m = matches[0]
-        return Canonicalized(
-            m.value, min(m.confidence, 0.8), Span(m.start, m.end), f"{m.reason}; no currency marker"
+        if not marked:
+            continue
+        after = _AFTER.match(text, m.end)
+        end = after.end() if after else m.end
+        value = m.value / 100 if paise else m.value
+        if not paise and after:  # "10 rupaye 25 paise": rupees followed by a paise number
+            tail = _PAISE_TAIL.match(text, after.end())
+            if tail:
+                tail_numbers = find_numbers(tail.group("n"))
+                if tail_numbers and float(tail_numbers[0].value) < 100:
+                    value = m.value + float(tail_numbers[0].value) / 100
+                    after = tail  # the span covers the paise part too
+        out.append(
+            Canonicalized(value, m.confidence, Span(m.start, end), f"{m.reason}; currency marker")
         )
-    return None
+    if not out and not require_marker:
+        out = [
+            Canonicalized(
+                m.value,
+                min(m.confidence, 0.8),
+                Span(m.start, m.end),
+                f"{m.reason}; no currency marker",
+            )
+            for m in matches
+        ]
+    return out
+
+
+def parse_amount(text: str, require_marker: bool = True) -> Canonicalized | None:
+    """The first amount in ``text``, in rupees (see ``find_amounts``)."""
+    amounts = find_amounts(text, require_marker)
+    return amounts[0] if amounts else None

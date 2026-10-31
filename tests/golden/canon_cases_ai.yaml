@@ -1,0 +1,103 @@
+# AI-drafted test cases (Gemini 3.8 Flash via agy, 2026-10-31), run against the parsers; a failure is
+# judged by hand: a wrong case is fixed or dropped, a real parser bug is fixed in the parser.
+cases:
+- {type: phone, input: "mera number note karo 9876543210", expected: "9876543210"}
+- {type: phone, input: "+91 98234 56789 pe call kar lena", expected: "9823456789"}
+- {type: phone, input: "मेरा नंबर है 08765432109", expected: "8765432109"}
+- {type: phone, input: "nau aath saat chhey paanch char teen do ek shunya", expected: "9876543210"}
+- {type: phone, input: "नौ आठ एक दो तीन चार पाँच छह सात आठ", expected: "9812345678"}
+- {type: phone, input: "nine eight double two five four one zero nine eight", expected: "9822541098"}
+- {type: phone, input: "डबल नौ आठ सात छः पाँच चार तीन दो एक", expected: "9987654321"}
+- {type: phone, input: "triple seven six five four three two one zero", expected: "7776543210"}
+- {type: phone, input: "ट्रिपल आठ नौ शून्य सात छः पाँच चार तीन", expected: "8889076543"}
+- {type: phone, input: "bhaiya 919876512345 pe gpay kar do", expected: "9876512345"}
+- {type: phone, input: "chhey do teen char paanch chhey saat aath nau shunya", expected: "6234567890"}
+- {type: phone, input: "is number pe bhejo 70123-45678", expected: "7012345678"}
+- {type: phone, input: "saat aath double nau double paanch chaar teen do ek", expected: "7899554321"}
+- {type: phone, input: "आठ सात double nine six five four three two one", expected: "8799654321"}
+- {type: phone, input: "9 8 7 1 2 3 4 5 6 0", expected: "9871234560"}
+- {type: phone, input: "सात आठ नौ शून्य एक दो तीन चार पाँच छह", expected: "7890123456"}
+- {type: phone, input: "mobile number hai 6398765432", expected: "6398765432"}
+- {type: phone, input: "nine one eight two seven three six four five zero", expected: "9182736450"}
+- {type: phone, input: "nau double aath saat chhey paanch char teen do ek", expected: "9887654321"}
+- {type: phone, input: "छह दो तीन चार पाँच छह सात आठ नौ एक", expected: "6234567891"}
+- {type: phone, input: "+91-8877665544 pe sampark karein", expected: "8877665544"}
+- {type: phone, input: "डबल सात आठ नौ शून्य एक दो तीन चार पाँच", expected: "7789012345"}
+- {type: phone, input: "nine eight seven six five four three triple two", expected: "9876543222"}
+- {type: phone, input: "mera number 987654321 hai", expected: none}
+- {type: phone, input: "987654321012 pe call karo", expected: none}
+- {type: phone, input: "5123456789 pe message bhej dena", expected: ambiguous}
+- {type: phone, input: "unke saath baat ho gayi thi kal", expected: none}
+- {type: phone, input: "order id OD4821 track karke batao", expected: none}
+- {type: phone, input: "nau aath saat chhey paanch char teen", expected: none}
+- {type: phone, input: "haan theek hai abhi bhej do", expected: none}
+- {type: quantity, input: "dedh kilo aalu de dena", expected: {value: 1.5, unit: kg}}
+- {type: quantity, input: "dhai sau gram paneer pack kar do", expected: {value: 250, unit: g}}
+- {type: quantity, input: "aadha litre doodh chahiye", expected: {value: 0.5, unit: l}}
+- {type: quantity, input: "paav kilo mirchi daal dena", expected: {value: 0.25, unit: kg}}
+- {type: quantity, input: "do darjan kele kitne ke diye", expected: {value: 2, unit: dozen}}
+- {type: quantity, input: "मुझे डेढ़ किलो प्याज चाहिए", expected: {value: 1.5, unit: kg}}
+- {type: quantity, input: "ढाई किलो चीनी दे दो", expected: {value: 2.5, unit: kg}}
+- {type: quantity, input: "आधा लीटर सरसों का तेल देना", expected: {value: 0.5, unit: l}}
+- {type: quantity, input: "paune do meter kapda kaat do", expected: {value: 1.75, unit: m}}
+- {type: quantity, input: "sava teen kilo seb de do", expected: {value: 3.25, unit: kg}}
+- {type: quantity, input: "saade char litre petrol daalna", expected: {value: 4.5, unit: l}}
+- {type: quantity, input: "500 ml amul taaza doodh pack", expected: {value: 500, unit: ml}}
+- {type: quantity, input: "10 piece samosa pack kar dijiye", expected: {value: 10, unit: piece}}
+- {type: quantity, input: "पाँच दर्जन अंडे चाहिए", expected: {value: 5, unit: dozen}}
+- {type: quantity, input: "15 km door hai yahan se", expected: {value: 15, unit: km}}
+- {type: quantity, input: "50 cm ka ribbon kaat do", expected: {value: 50, unit: cm}}
+- {type: quantity, input: "दस नग साबुन की टिकिया", expected: {value: 10, unit: piece}}
+- {type: quantity, input: "ek darjan kela dena bhaiya", expected: {value: 1, unit: dozen}}
+- {type: quantity, input: "250 gm butter add kar lo", expected: {value: 250, unit: g}}
+- {type: quantity, input: "paune teen litre paani", expected: {value: 2.75, unit: l}}
+- {type: quantity, input: "dedh sau gram jeera dena", expected: {value: 150, unit: g}}
+- {type: quantity, input: "saade aath metre lambi rassi", expected: {value: 8.5, unit: m}}
+- {type: quantity, input: "तीन किलो बासमती चावल", expected: {value: 3, unit: kg}}
+- {type: quantity, input: "दो सौ पचास मिली सिरप", expected: {value: 250, unit: ml}}
+- {type: quantity, input: "sava do darjan ande", expected: {value: 2.25, unit: dozen}}
+- {type: quantity, input: "paav litre doodh dena", expected: {value: 0.25, unit: l}}
+- {type: quantity, input: "thoda kilo me de do bhaiya", expected: none}
+- {type: quantity, input: "bhej do jaldi se parcel", expected: none}
+- {type: quantity, input: "room number 402 me delivery kar do", expected: none}
+- {type: quantity, input: "do katori dahi de do", expected: none}
+- {type: money, input: "kul milakar 1500 rupaye bane", expected: 1500}
+- {type: money, input: "₹ 25000 online transfer kar diye", expected: 25000}
+- {type: money, input: "pachaas hazaar rupaye cash me de diye", expected: 50000}
+- {type: money, input: "दो लाख रुपये का चेक है", expected: 200000}
+- {type: money, input: "paanch sau rupaye bache hain", expected: 500}
+- {type: money, input: "dedh lakh rupees lagega total", expected: 150000}
+- {type: money, input: "dhai hazaar rupaye de diye the", expected: 2500}
+- {type: money, input: "saade teen sau rupaye ka bill bana", expected: 350}
+- {type: money, input: "Rs 499.50 ka recharge kiya", expected: 499.5}
+- {type: money, input: "ek crore rupaye ka plot hai", expected: 10000000}
+- {type: money, input: "पचास रुपये पचास पैसे हुए", expected: 50.5}
+- {type: money, input: "10 rupaye 25 paise bache hain", expected: 10.25}
+- {type: money, input: "maine usko 500 bheja tha kal subah", expected: none}
+- {type: money, input: "OD4821 cancel kar do", expected: none}
+- {type: money, input: "unke saath baat ki thi paise ke baare me nahi bola", expected: none}
+- {type: number, input: "teen sau pachaas", expected: 350}
+- {type: number, input: "saat sau baasath", expected: 762}
+- {type: number, input: "एक सौ पच्चीस", expected: 125}
+- {type: number, input: "bawan", expected: 52}
+- {type: number, input: "nau sau ninyanve", expected: 999}
+- {type: number, input: "gyarah", expected: 11}
+- {type: number, input: "चालीस", expected: 40}
+- {type: number, input: "chaar sau bees", expected: 420}
+- {type: number, input: "kuch bhi samajh nahi aa raha", expected: none}
+- {type: number, input: "unke saath baat ki", expected: none}
+- {type: time, input: "shaam ko paanch baje milte hain", expected: "17:00"}
+- {type: time, input: "subah ke saade saat baje call karna", expected: "07:30"}
+- {type: time, input: "dopahar do baje aana", expected: "14:00"}
+- {type: time, input: "raat ke gyarah baje delivery aayegi", expected: "23:00"}
+- {type: time, input: "शाम साढ़े छह बजे पहुँच जाना", expected: "18:30"}
+- {type: time, input: "सुबह सवा नौ बजे की ट्रेन है", expected: "09:15"}
+- {type: time, input: "raat ko paune barah baje", expected: "23:45"}
+- {type: time, input: "dopahar dedh baje lunch karenge", expected: "13:30"}
+- {type: time, input: "paanch baje aana", expected: ambiguous}
+- {type: time, input: "aaj shaam ko baat karte hain", expected: none}
+- {type: duration, input: "dedh ghanta lagega aane me", expected: 90}
+- {type: duration, input: "aadha ghanta ruko bas", expected: 30}
+- {type: duration, input: "do ghante me pahunch jaunga", expected: 120}
+- {type: duration, input: "पौने दो घंटे का समय लगेगा", expected: 105}
+- {type: duration, input: "jaldi bhej do der mat karna", expected: none}
