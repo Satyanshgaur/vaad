@@ -107,10 +107,13 @@ def main() -> None:
                 alt_hits = [
                     1 for v, c, alts in out.get(kind, []) if any(same(a, exp) for a in alts)
                 ]
-                if hits and max(c for _, c, _ in hits) >= 0.9:
-                    s["confident and right"] += 1
+                best = max((c for _, c, _ in hits), default=0.0)
+                if best >= 0.9:
+                    s["right and sure (>= 0.9: repairs a wrong value)"] += 1
+                elif best >= 0.6:
+                    s["right, moderate (0.6-0.9: passes if the model agrees)"] += 1
                 elif hits:
-                    s["right but unsure (asks)"] += 1
+                    s["right but would ask (< 0.6)"] += 1
                 elif alt_hits:
                     s["ambiguous, right one offered"] += 1
                 else:

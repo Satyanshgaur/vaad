@@ -206,8 +206,10 @@ and nothing suggests routing is needed. Kaggle notebook (c) goes with it.
 - [ ] **Independent held-out set:** native speakers who have not seen the lexicons say requests in
       their own words, with their own gold values; split into tuning and held-out halves; scored
       once. Blocks every canonicalizer claim. No author assigned yet.
-- [ ] **Real typed requests:** 50-200 consented messages; measure how often spoken-form values
-      appear. No collection started.
+- [x] **Typed requests, first batch:** 224 messages from 8 writers (RESULTS R16). Spoken-form number words
+      in 8.9% of messages, highly writer-dependent (one writer 12 of 28, seven writers 0-4 of 28); digits
+      in 80%. Used as development data. **Still needed:** a fresh batch from new writers as the held-out
+      half, and real (not card-driven) messages.
 - [ ] **Bigger models:** value-heavy on one 8-9B local model and one hosted model, to see whether
       the gap is a small-model problem.
 - [ ] **Rescoring audit:** 52 rows in `private/review/rescore_audit.csv`; needs a native reviewer.
