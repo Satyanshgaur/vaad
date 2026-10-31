@@ -244,14 +244,15 @@ preprint, demo, blog) which the author reviews before anything is published.
 - [ ] Use NeMo Hindi ITN as a reference or fallback for Devanagari spoken forms
 
 **Week 5: dates, times, decisions**
-- [ ] `dates.py`: aaj, kal, parson, narson, agle/pichhle + weekday, with `dateparser` as a fallback
+- [x] `dates.py`: aaj, kal, parson, narson, agle/pichhle + weekday, day-month, N din baad/pehle, tarikh
+      (no `dateparser` fallback needed yet)
 - [ ] "kal" resolver: verb tense ("bhej do" or "karna hai" → future; "aaya tha" or "kiya tha" →
       past), then field meaning (e.g. `delivery_date` → future), otherwise **flag**
-- [ ] `times.py`: subah, dopahar, shaam, raat with baje, saade, sava, paune
+- [x] `times.py`: subah, dopahar, shaam, raat with baje, saade, sava, paune, am/pm, durations
 - [ ] `canonicalize()`: the schema chooses the value type. Free-text fields are never changed
 - [ ] `decide.py` thresholds tuned on dev (the decision logic already exists)
-- [ ] Gate 4: `tests/golden/canon_cases.yaml` with 300+ cases
-- [ ] Gate 5: hypothesis tests for round trips, idempotence, and free text left untouched
+- [ ] Gate 4: `tests/golden/canon_cases.yaml` with 300+ cases (237 so far)
+- [x] Gate 5: hypothesis tests for round trips, idempotence, and free text left untouched (numbers, times, dates)
 - [ ] Gate 6: no value invention. Every output traces to a span in the user turn or to the
       reference date
 - [ ] Gate 8: pytest-benchmark p95 under 20 ms for 1,000 calls, and no more than 25% slower than main

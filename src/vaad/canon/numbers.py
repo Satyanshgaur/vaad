@@ -8,38 +8,43 @@ returned for text that is not a number (a bare "bhej do" is a verb, not 2).
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from fractions import Fraction
 
 from vaad.canon.lexicon import NumberLexicon, number_lexicon
+from vaad.canon.tokens import DEVANAGARI_DIGITS as _DEVANAGARI_DIGITS
+from vaad.canon.tokens import Token as _Token
+from vaad.canon.tokens import tokenize as _tokenize
 from vaad.types import Canonicalized, Span
 
-_TOKEN = re.compile(
-    r"(?P<digits>[0-9०-९][0-9०-९,]*(?:\.[0-9०-९]+)?)"  # noqa: RUF001
-    r"|(?P<word>[A-Za-zऀ-॥॰-ॿ]+)"
-    r"|(?P<sym>\S)"
-)
-_DEVANAGARI_DIGITS = {0x0966 + i: ord(str(i)) for i in range(10)}
 _CONJUNCTIONS = frozenset({"aur", "ya", "to", "phir", "bas", "na", "please", "plz", "ji", "hai"})
 _SUFFIXES = {"k": 1000, "cr": 10_000_000}
 # Letters that may touch a digit and still leave it a quantity ("2kg", "5L", "9pm"); any other
 # letters touching a digit make it part of an identifier ("OD4821", "U123456").
 _UNIT_SUFFIXES = frozenset(
-    {"k", "cr", "l", "ml", "kg", "g", "gm", "km", "m", "cm", "mm", "hr", "hrs", "am", "pm", "rs"}
+    {
+        "k",
+        "cr",
+        "l",
+        "ml",
+        "kg",
+        "g",
+        "gm",
+        "km",
+        "m",
+        "cm",
+        "mm",
+        "hr",
+        "hrs",
+        "am",
+        "pm",
+        "rs",
+        "st",
+        "nd",
+        "rd",
+        "th",
+    }
 )
-
-
-@dataclass(frozen=True, slots=True)
-class _Token:
-    text: str
-    start: int
-    end: int
-    kind: str  # "digits", "word" or "sym"
-
-    @property
-    def norm(self) -> str:
-        return self.text.lower()
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,12 +57,6 @@ class NumberMatch:
 
     def canonicalized(self) -> Canonicalized:
         return Canonicalized(self.value, self.confidence, Span(self.start, self.end), self.reason)
-
-
-def _tokenize(text: str) -> list[_Token]:
-    return [
-        _Token(m.group(), m.start(), m.end(), m.lastgroup or "sym") for m in _TOKEN.finditer(text)
-    ]
 
 
 def _digits_value(token: _Token) -> Fraction:

@@ -500,6 +500,63 @@ Paired differences (points; CI over tasks):
   calibration result is **not supported**: calibration alone is about +5 and not significant, and the
   Indic-specific part is a non-significant +3 to +7. A larger task set or more seeds would be needed.
 
+### R15. Time and date parsers on MASSIVE hi-IN (2026-10-31)
+
+Parsers: `canon/times.py`, `canon/dates.py` (+ numbers and the lexicons). Evaluation:
+`scripts/eval_massive.py`, 16,521 Hindi voice-assistant commands (Devanagari, CC BY 4.0) with the
+English parallel as independent gold. **Method:** developed against the `train` partition, checked on
+`dev`, then frozen and run **once** on `test`. `dev` is not pristine (a few variants such as ऐ. एम. were
+added after reading its misses); `test` was not looked at before the freeze. The word lists and
+direction cues are AI-written (not native-reviewed); the tense cues were chosen using `train` counts.
+Only a domain of calendar, alarm, weather and reminder commands is covered; there is no payments or
+delivery text here.
+
+**"kal" (tomorrow or yesterday)**, the tense resolver with no field information (reference date fixed):
+
+| Partition | Utterances | Yesterday | Always-tomorrow accuracy | Decided (conf >= 0.6) | Accuracy when decided |
+|---|---|---|---|---|---|
+| train | 283 | 34 | 88.0% | 121 (42.8%) | 94.2% (114/121) |
+| dev | 58 | 4 | 93.1% | 32 (55.2%) | 96.9% (31/32) |
+| **test (once)** | 69 | 5 | 92.8% | 35 (50.7%) | **97.1% (34/35)** |
+
+Pooled over all three: 410 utterances, 43 "yesterday". A rule that always answers "tomorrow" is wrong
+on all 43 (10.5%). The resolver is wrong on **10 (2.4%)**, flags **222 (54%)** for clarification
+(no tense cue in the sentence), and is right on 178. For the "yesterday" cases specifically it gets
+19 right, flags 18 and gets 6 wrong. On the held-out test partition the gain over the baseline when it
+decides is 97.1% against 92.8%, but with 35 decided utterances (one error against about 2.5 expected)
+that difference is **not statistically established**.
+
+What this shows and what it does not:
+- Silent wrong-direction errors fall from 10.5% to 2.4% **at the cost of asking about half the time**.
+  That is only a good trade where a wrong date is expensive. With a tool field that fixes the direction
+  (a delivery date is future, a statement's end date past) the field resolves most of the flagged cases
+  without asking; MASSIVE has no field, so that path is untested here and is covered only by
+  hand-made golden cases.
+- Resultative verbs (किया, गया, दिया) are deliberately **not** past cues: in this data they describe
+  *setting up* a future event ("अलार्म सेट किया है") and appeared only with "tomorrow". The remaining
+  errors are of that kind ("कल के लिए मैंने क्या रिमाइंडर सेट किया था": past tense, tomorrow's event):
+  a text-only rule cannot separate them, which is the case for flagging.
+
+**Clock times** (slots with an English clock reading; gold from the English slot, e.g. "nine a. m.";
+the whole utterance is parsed so a part-of-day word outside the slot counts):
+
+| Partition | Slots | Value among the parser's readings | Confident (>= 0.9) share | Exactly right when confident |
+|---|---|---|---|---|
+| train | 436 | 95.2% | 83.9% | 98.6% (361/366) |
+| dev | 66 | 92.4% | 75.8% | 98.0% (49/50) |
+| **test (once)** | 90 | 96.7% | 76.7% | **100% (69/69)** |
+
+A bare "paanch baje" is genuinely AM or PM; it is returned at 0.55 with both readings, so 16-24% of
+slots are deliberately not confident. Misses are mostly spoken hours with no "baje" ("प्रातः दस"), and
+a few spacing variants.
+
+**Date slots:** 74-75% of MASSIVE `date` slots contain something the parser reads (today, tomorrow,
+weekday, "agle ...", day-and-month, N days later); the rest are week and month phrases ("इस सप्ताह",
+"इस महीने") that are not dates here. Gold values for dates other than "kal" were not checked.
+
+**Tests:** 394 pass (237 golden cases, hypothesis properties for round trips, am/pm, period words,
+offsets, weekdays, tense-cue direction, spans).
+
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
 | Condition minus raw | English | Hindi | Hinglish |
