@@ -1,0 +1,3 @@
+id,writer_id,source,scenario_id,written_on,message,intended_values,script
+T001,w01,prompted,S03,2026-11-02,,weight_kg=1.5; delivery_date=2026-11-04,
+T002,w01,prompted,S07,2026-11-02,,amount_inr=2500; recipient_phone=,
