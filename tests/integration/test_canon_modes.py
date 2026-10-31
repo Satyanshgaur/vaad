@@ -124,3 +124,19 @@ def test_both_annotates_and_verifies(tmp_path: Path) -> None:
         response = ask(client(tmp_path, "both"), "dedh kilo ka parcel kal tak bhej do")
     assert "[=1.5]" in json.loads(route.calls.last.request.content)["messages"][-1]["content"]
     assert arguments_of(response)["weight_kg"] == 1.5
+
+
+@pytest.mark.integration
+def test_the_audit_trail_records_every_checked_value_without_text(tmp_path: Path) -> None:
+    with respx.mock:
+        respx.post(URL).mock(return_value=reply({"weight_kg": 15, "delivery_date": "2026-10-25"}))
+        ask(client(tmp_path, "verify"), "dedh kilo ka parcel kal tak bhej do")
+    trace = json.loads((tmp_path / "t.jsonl").read_text(encoding="utf-8"))
+    rows = {r["arg"]: r for r in trace["canon_args"]}
+    assert rows["weight_kg"]["status"] == "repair" and rows["weight_kg"]["kind"] == "quantity"
+    assert rows["delivery_date"]["status"] == "agree" and rows["delivery_date"]["kind"] == "date"
+    for row in rows.values():
+        assert row["tool"] == "ship_order" and 0 < row["confidence"] <= 1
+        assert row["span"] and row["span"][0] < row["span"][1]  # offsets only
+    assert "dedh" not in json.dumps(trace)  # the user's words are never stored
+    assert trace["canon_version"].count("+lex.") == 1

@@ -81,3 +81,17 @@ def test_annotate_turn_marks_only_spoken_forms() -> None:
     assert "2 kilo," in out and "[=2]" not in out and "[=500]" not in out
     assert annotate_turn("hello", REF) == "hello"
     assert "[=" not in annotate_turn("kal tak", REF)  # no tense cue: not sure enough to annotate
+
+
+@pytest.mark.unit
+def test_phone_numbers_are_masked_in_the_audit_helper() -> None:
+    from vaad.server.pipeline import _mask
+
+    assert _mask("9812345670") == "XXXXXXXX70"
+
+
+@pytest.mark.unit
+def test_canon_version_changes_with_the_lexicons() -> None:
+    from vaad.canon.version import canon_version
+
+    assert canon_version().startswith("0.") and "+lex." in canon_version()

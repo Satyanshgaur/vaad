@@ -61,6 +61,7 @@ class Trace:
     canon_args: list[dict[str, Any]] = field(default_factory=list)
     decision: Decision | None = None
     retried: bool = False
+    canon_version: str | None = None  # lexicon fingerprint of the parsers that ran
     status: int | None = None
     error: str | None = None
     stage_ms: dict[str, float] = field(default_factory=dict)
