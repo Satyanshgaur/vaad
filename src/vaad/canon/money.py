@@ -13,7 +13,7 @@ from vaad.canon.numbers import NumberMatch, find_numbers
 from vaad.types import Canonicalized, Span
 
 _AFTER = re.compile(
-    r"\s*(?P<unit>rupaye|rupees?|rupiye|rupaya|rupiya|rs\.?|inr|paise|paisa|"
+    r"\s*(?P<unit>rupaye|rupees?|rupiye|rupaya|rupiya|rupay|rupe|rs\.?|inr|paise|paisa|"
     r"रुपये|रुपए|रुपया|रु\.?|पैसे)(?![A-Za-zऀ-ॿ])",
     re.IGNORECASE,
 )

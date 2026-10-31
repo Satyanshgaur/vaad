@@ -262,3 +262,13 @@ cases:
   - {type: money, input: "5L loan chahiye", expected: 500000, field_is_amount: true}
   - {type: money, input: "1.5L transfer karna hai", expected: 150000, field_is_amount: true}
   - {type: number, input: "five thirty", all: [5, 30]}
+  - {type: time, input: "train 9 bje chalegi", expected: ambiguous}
+  - {type: time, input: "subah 7 bje ki train", expected: "07:00"}
+  - {type: time, input: "6.30 pe milte hain", expected: ambiguous}
+  - {type: time, input: "file 4.8 mb ki hai", expected: none}
+  - {type: date, input: "mai 4 bje nikal jaunga", expected: none, ref: "2026-10-31"}
+  - {type: date, input: "11 May ko", expected: "2026-05-11", ref: "2026-10-31"}
+  - {type: duration, input: "film 2 hr 5 min ki hai", expected: 125}
+  - {type: duration, input: "1 hr 20 min", expected: 80}
+  - {type: duration, input: "10 min baad", expected: 10}
+  - {type: money, input: "doodh 20 rupay ka hai", expected: 20}
