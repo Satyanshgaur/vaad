@@ -113,7 +113,13 @@ async def chat_completions(request: Request) -> Response:
     try:
         if use_pipeline:
             result = await run_tool_pipeline(
-                client, payload, settings.grammar, trace, content_type, authorization
+                client,
+                payload,
+                settings.grammar,
+                trace,
+                content_type,
+                authorization,
+                settings.canon,
             )
             reply = BackendResponse(result.status, result.body, result.content_type, 0.0)
         else:

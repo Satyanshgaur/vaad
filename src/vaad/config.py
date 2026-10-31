@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from typing import Literal
 
@@ -40,6 +41,15 @@ class GrammarSettings(BaseModel):
     retry: bool = True
 
 
+class CanonSettings(BaseModel):
+    """Spoken-value handling. ``annotate`` writes parsed values into the user's turn, ``verify``
+    checks the model's arguments against the turn (repair, retry or flag), ``both`` does both."""
+
+    mode: Literal["off", "annotate", "verify", "both"] = "off"
+    ref_date: date | None = None  # today when None; fixed in evaluations
+    ungrounded: Literal["ignore", "flag"] = "ignore"  # a typed value with no support in the turn
+
+
 class Settings(BaseModel):
     gateway_enabled: bool = True
     small: Backend
@@ -47,6 +57,7 @@ class Settings(BaseModel):
     routing: Routing = Routing()
     thresholds: Thresholds = Thresholds()
     grammar: GrammarSettings = GrammarSettings()
+    canon: CanonSettings = CanonSettings()
     trace_path: Path | None = Path("traces/vaad.jsonl")
     # Per-tool overrides: {tool_name: {arg_name: value_type | "free_text"}}
     overrides: dict[str, dict[str, str]] = {}

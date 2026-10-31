@@ -108,6 +108,8 @@ def check_argument(
         return ArgCheck("ungrounded", raw, 0.55, f"nothing in the turn supports this {kind}")
     for c in found:
         if _same(kind, raw, c.value):
+            if c.confidence < 0.6:  # agreeing with a coin flip is not support
+                return ArgCheck("ambiguous", raw, c.confidence, c.reason)
             return ArgCheck("agree", raw, c.confidence, c.reason)
     best = max(found, key=lambda c: c.confidence)
     if len(found) > 1 and sum(c.confidence >= 0.9 for c in found) > 1:

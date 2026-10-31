@@ -85,6 +85,10 @@ grammar:
   infer_enums: true
   max_length: 512
   retry: true              # false: flag on the first invalid call
+canon:
+  mode: off              # off | annotate | verify | both (docs/PREREG.md A5)
+  ref_date: null         # today when null; fixed in evaluations
+  ungrounded: ignore     # ignore | flag a typed value with no support in the turn
 trace_path: traces/vaad.jsonl
 overrides: {}              # per-tool value-type overrides, Phase 2
 ```
