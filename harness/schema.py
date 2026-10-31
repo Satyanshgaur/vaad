@@ -35,7 +35,7 @@ class ExpectedCall(BaseModel):
 
 class Task(BaseModel):
     id: str
-    source: Literal["bfcl_hi", "bfcl_en", "bfcl_hinglish", "value_heavy"]
+    source: Literal["bfcl_hi", "bfcl_en", "bfcl_hinglish", "value_heavy", "human_typed"]
     lang: Lang
     # Same pair_id across a task's English/Hindi/Hinglish versions; splits are made on it.
     pair_id: str
