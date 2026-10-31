@@ -42,6 +42,8 @@ class ArgCheck:
     value: Any
     confidence: float
     reason: str
+    kind: str = ""  # which parser decided: date, time, money, quantity, phone
+    span: tuple[int, int] | None = None  # character offsets in the user's turn (no text is stored)
 
 
 def field_kind(name: str, schema: dict[str, Any]) -> str:
@@ -96,6 +98,10 @@ def _same(kind: str, raw: Any, candidate: Any) -> bool:
     return str(raw).strip() == str(candidate).strip()
 
 
+def _span(c: Canonicalized) -> tuple[int, int] | None:
+    return (c.source.start, c.source.end) if c.source is not None else None
+
+
 def check_argument(
     name: str, schema: dict[str, Any], raw: Any, turn: str, ref_date: date
 ) -> ArgCheck | None:
@@ -105,18 +111,19 @@ def check_argument(
         return None
     found = _candidates(kind, name, schema, turn, ref_date)
     if not found:
-        return ArgCheck("ungrounded", raw, 0.55, f"nothing in the turn supports this {kind}")
+        return ArgCheck("ungrounded", raw, 0.55, f"nothing in the turn supports this {kind}", kind)
     for c in found:
         if _same(kind, raw, c.value):
             if c.confidence < 0.6:  # agreeing with a coin flip is not support
-                return ArgCheck("ambiguous", raw, c.confidence, c.reason)
-            return ArgCheck("agree", raw, c.confidence, c.reason)
+                return ArgCheck("ambiguous", raw, c.confidence, c.reason, kind, _span(c))
+            return ArgCheck("agree", raw, c.confidence, c.reason, kind, _span(c))
     best = max(found, key=lambda c: c.confidence)
     if len(found) > 1 and sum(c.confidence >= 0.9 for c in found) > 1:
-        return ArgCheck("ambiguous", raw, 0.5, f"the turn has several {kind} values")
+        return ArgCheck("ambiguous", raw, 0.5, f"the turn has several {kind} values", kind)
     if best.confidence < 0.6:
-        return ArgCheck("ambiguous", best.value, best.confidence, best.reason)
-    return ArgCheck("repair", best.value, best.confidence, f"turn says {best.value}; {best.reason}")
+        return ArgCheck("ambiguous", best.value, best.confidence, best.reason, kind, _span(best))
+    reason = f"turn says {best.value}; {best.reason}"
+    return ArgCheck("repair", best.value, best.confidence, reason, kind, _span(best))
 
 
 def annotate_turn(turn: str, ref_date: date) -> str:

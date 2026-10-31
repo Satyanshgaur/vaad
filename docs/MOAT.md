@@ -52,7 +52,7 @@ the Indian voice companies' reported moats are proprietary code-mixed call audio
 do not have. The realistic target is **permanence, not a wall**: be the trusted reference implementation and
 evaluation for spoken values, with a corpus and partners that are hard to replicate quickly.
 
-## 4. What we build, in this order
+## 4. What we build, in this order (items 2 and 3 done 2026-10-31: docs/CALIBRATION.md and the audit trail in ARCHITECTURE.md)
 
 1. **A model-in-the-loop evaluation on human-written text** (pre-registered as A6): tests whether the layer helps
    on text nobody tuned it on, and gives the honest effect size. Calibrates the claim.

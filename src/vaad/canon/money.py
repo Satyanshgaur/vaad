@@ -56,7 +56,9 @@ def find_amounts(text: str, require_marker: bool = True) -> list[Canonicalized]:
             Canonicalized(value, m.confidence, Span(m.start, end), f"{m.reason}; currency marker")
         )
     if not out and not require_marker:
-        cap = 0.9 if len(matches) == 1 else 0.8  # a lone number in an amount field is clear enough
+        # a lone number in an amount field is clear enough; with several numbers and no currency
+        # word it was right only about half the time (calibration card), so it asks
+        cap = 0.9 if len(matches) == 1 else 0.55
         out = [
             Canonicalized(
                 m.value,

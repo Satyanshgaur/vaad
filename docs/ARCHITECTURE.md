@@ -115,7 +115,11 @@ request_id, lang, lang_confidence, tier, raw_args, canon_args, decision, retried
 status, error, stage_ms {backend, validate, total}
 ```
 
-`raw_args` is the first attempt's calls as `{name, arguments}`; malformed arguments stay as the
+With `canon.mode` on, the trace also carries an **audit trail**: `canon_version` (package version plus a
+fingerprint of the lexicons) and, in `canon_args`, one record per checked tool argument: tool, argument, parser
+kind, status (agree / repair / ambiguous / ungrounded), the model's value and the final value, confidence, the rule
+that decided, and the character span in the user's turn. Offsets only: the user's words are never stored, and
+phone numbers are masked to their last two digits. `raw_args` is the first attempt's calls as `{name, arguments}`; malformed arguments stay as the
 raw string. `lang`, `canon_args` and (for non-tool requests) `decision` are empty for now.
 The harness reads these files for per-stage analysis.
 

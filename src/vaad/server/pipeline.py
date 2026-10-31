@@ -13,6 +13,7 @@ from datetime import date
 from typing import Any
 
 from vaad.canon import annotate_turn, check_argument
+from vaad.canon.version import canon_version
 from vaad.config import CanonSettings, GrammarSettings
 from vaad.grammar.tighten import TightenOptions, tighten
 from vaad.grammar.validate import validate_call
@@ -129,6 +130,12 @@ def flag_body(model: Any, inspection: Inspection, attempts: int, request_id: str
     return json.dumps(body, ensure_ascii=False).encode()
 
 
+def _mask(value: Any) -> str:
+    """Phone numbers go into the audit trail masked to their last two digits."""
+    text = str(value)
+    return "X" * max(0, len(text) - 2) + text[-2:]
+
+
 def _last_user_text(messages: list[dict[str, Any]]) -> str:
     for message in reversed(messages):
         if message.get("role") == "user" and isinstance(message.get("content"), str):
@@ -176,11 +183,24 @@ def canon_pass(
         for arg, value in list(arguments.items()):
             prop = props.get(arg)
             check = check_argument(arg, prop, value, turn, ref) if isinstance(prop, dict) else None
-            if check is None or check.status == "agree":
+            if check is None:
                 continue
-            trace.canon_args.append({"arg": arg, "status": check.status, "was": value,
-                                     "value": check.value, "confidence": check.confidence,
-                                     "reason": check.reason})  # fmt: skip
+            private = check.kind == "phone"  # phone numbers are masked in the trail
+            trace.canon_args.append(
+                {
+                    "tool": function.get("name"),
+                    "arg": arg,
+                    "kind": check.kind,
+                    "status": check.status,
+                    "was": _mask(value) if private else value,
+                    "value": _mask(check.value) if private else check.value,
+                    "confidence": round(check.confidence, 3),
+                    "reason": check.reason,
+                    "span": list(check.span) if check.span else None,
+                }
+            )
+            if check.status == "agree":
+                continue
             where = f"{function.get('name')}.{arg}"
             if check.status == "repair" and check.confidence >= 0.9:
                 arguments[arg] = check.value
@@ -217,6 +237,8 @@ async def run_tool_pipeline(
 ) -> Result:
     """Tighten, call, validate, check values; one guided retry; otherwise flag. Fills ``trace``."""
     canon = canon or CanonSettings()
+    if canon.mode != "off":
+        trace.canon_version = canon_version()
     tools: list[dict[str, Any]] = payload["tools"]
     send_tools = tightened_tools(tools, grammar) if grammar.enabled else tools
     ref = canon.ref_date or date.today()
