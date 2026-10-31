@@ -293,3 +293,9 @@ Also reported: flag rate and wrong-value rate per mode.
 parsers were written knowing the trap list, so this is a **dev estimate and an optimistic ceiling**,
 not evidence. The claim requires the independent held-out set (PLAN, evidence track). The value-heavy
 test split is not touched here.
+
+### Outcome of H9 (2026-10-31)
+Primary mode `both`: recovers 87%, 114% and 100% of the value-heavy Hinglish gap with CIs excluding 0 (gain clause
+met on 3 of 3 models); BFCL English change -4.8, -4.8 and -1.6 points with CI lower bounds -11.3, -11.3 and
+-8.1 (regression clause **fails on 3 of 3**). **H9 as written does not hold.** The `annotate`-only ablation
+satisfies every clause on 2 of 3 models (not pre-registered as primary). Dev, circular, optimistic: see RESULTS R19.

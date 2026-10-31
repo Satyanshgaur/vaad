@@ -629,6 +629,59 @@ Caveats: card-driven writing (values given as digits), 7 writers, one date and w
 covers amounts, quantities, dates and times. This says the parsers read what people type; it does not show
 that the models make fewer mistakes with them (that is H9).
 
+### R19. H9: does the normalizer close the spoken-value gap? (2026-10-31, pre-registered in A5)
+
+Qwen3.5-4B, Granite-4.0-micro, Ministral-3-3B (Q4_K_M), dev set, 4 seeds, temperature 0.7, through the
+gateway with grammar tightening off and the guided retry on, reference date 2026-10-24. Modes: `off` (control),
+`annotate` (parsed values written into the user's turn), `verify` (the model's arguments checked against the
+turn: repair at >= 0.9, retry at 0.6-0.9, flag below 0.6), `both` (primary). Tasks: value-heavy (69) and BFCL
+English (62, regression check). Parsers at commit `ef40312` (the pre-registered state; the later chat and typed-text
+fixes are not in these runs). Reports `harness/reports/h9-<model>-<mode>` (raw gateway responses omitted).
+
+pass^4 in points, value-heavy Hinglish (23 scenarios), paired change over `off`:
+
+| Model | off | annotate | verify | **both** | Gap (en - Hinglish, off) | `both` recovers |
+|---|---|---|---|---|---|---|
+| Qwen3.5-4B | 21.7 | 78.3 (+56.5 [+34.8, +78.3]) | 43.5 (+21.7 [+4.3, +39.1]) | **78.3 (+56.5 [+34.8, +78.3])** | 65.2 | **87%** |
+| Granite-4.0-micro | 21.7 | 87.0 (+65.2 [+43.5, +82.6]) | 52.2 (+30.4 [+13.0, +52.2]) | **91.3 (+69.6 [+52.2, +87.0])** | 60.9 | **114%** |
+| Ministral-3-3B | 26.1 | 78.3 (+52.2 [+30.4, +73.9]) | 52.2 (+26.1 [+8.7, +43.5]) | **78.3 (+52.2 [+30.4, +73.9])** | 52.2 | **100%** |
+
+Value-heavy Hindi, `off` to `both`: Qwen 43.5 to 91.3, Granite 43.5 to 82.6, Ministral 8.7 to 17.4 (+8.7, CI includes 0).
+The wrong-value rate on value-heavy Hinglish falls from 0.52 / 0.62 / 0.54 to **0.01 / 0.00 / 0.08**, and on
+Hindi from 0.42 / 0.37 / 0.34 to 0.00 / 0.04 / 0.00.
+
+The cost, English:
+
+| Model | VH English off to both | BFCL English off to both (paired change) | English flag rate off to both |
+|---|---|---|---|
+| Qwen3.5-4B | 87.0 to 78.3 | 79.0 to 74.2 (-4.8 [-11.3, 0.0]) | 1% to 3% |
+| Granite-4.0-micro | 82.6 to 73.9 | 66.1 to 61.3 (-4.8 [-11.3, 0.0]) | 1% to 4% |
+| Ministral-3-3B | 78.3 to 69.6 | 59.7 to 58.1 (-1.6 [-8.1, +3.2]) | 2% to 8% |
+
+**Verdict against the pre-registered rule (primary mode `both`; recovers >= 50% of the gap with the CI excluding 0 on
+>= 2 of 3 models, and BFCL English CI lower bound above -5): the gain clause is met on 3 of 3 models; the English
+clause fails on 3 of 3 (lower bounds -11.3, -11.3, -8.1). So H9 as written does not hold.** Two things to say plainly:
+- The English clause is nearly unsatisfiable at this size: with 62 English tasks a paired CI is about +-8 points
+  wide, so it can only pass when the true change is positive. The point estimates (-1.6 to -4.8) are small
+  and the intervals reach 0, but the rule is the rule. The same clause was used for H7.
+- The cost is mostly questions, not wrong answers. A flagged reply counts as a failure here unless the task is a
+  clarify task, so the extra asks ("is that AM or PM?", "kal: tomorrow or yesterday?") lower the score
+  even where asking is the right behaviour.
+
+**Ablation (reported, not a pre-registered test).** `annotate` alone (no checking) recovers 87% / 107% / 100%
+of the gap with BFCL English at -1.6 [-4.8, 0.0] (Qwen), -1.6 [-4.8, 0.0] (Granite) and -3.2 [-8.1, 0.0]
+(Ministral). It satisfies every clause of the rule on **2 of 3** models (Qwen, Granite) but was not the primary
+mode, so this is a lead for the held-out set, not a result. `verify` alone recovers 33% / 50% / 50% and costs
+English the most: its value is the guarantee (it removes wrong values, repairs numbers the model got wrong,
+asks when ambiguous), not accuracy. Compared with the other fixes for the same gap: the worked prompt recovered
+7-27% (R12) and translate-first 7% (R13); annotation recovers 87-107%.
+
+**Caveats that matter.** (1) Circular: the value-heavy dev set and the lexicons share an author and the traps are
+known to the parsers, so these are optimistic dev numbers, not evidence. The card-driven typed batches (R16, R17)
+and an independent held-out value-heavy set are what test generalization. (2) 23 scenarios per language, wide
+intervals. (3) Ministral on Hindi is poor either way. (4) Gold counts a clarification as a miss, so flag-heavy
+modes are penalized. (5) One run of each mode, four seeds.
+
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
 | Condition minus raw | English | Hindi | Hinglish |
