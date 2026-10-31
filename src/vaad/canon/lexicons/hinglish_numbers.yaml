@@ -140,6 +140,8 @@ multipliers:
   cr: 10000000
   arab: 1000000000
 fractions:
+  aadhe: 0.5
+  adhe: 0.5
   aadha: 0.5
   adha: 0.5
   aadhi: 0.5

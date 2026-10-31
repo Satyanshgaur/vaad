@@ -2,6 +2,8 @@
 # Numbers: written by Claude from general knowledge 2026-10-31, NOT yet native-reviewed.
 # - {type: number, input: ..., expected: N | none}   first number in the text, or no number
 # - {type: number, input: ..., all: [N, ...]}        every number, in order
+# - {type: time|duration|date, input: ..., expected: ...}  "HH:MM", minutes, or ISO date (ref 2026-10-24,
+#   a Saturday; `field` fixes the direction of kal/parson; `expected: ambiguous` = confidence < 0.6)
 cases:
   - {type: number, input: "ek", expected: 1}
   - {type: number, input: "do kilo", expected: 2}
@@ -158,3 +160,85 @@ cases:
   - {type: money, input: "teen din baad", expected: none}
   - {type: money, input: "order bhej do", expected: none}
   - {type: money, input: "dedh lakh", field_is_amount: true, expected: 150000}
+  - {type: time, input: "subah 9 baje", expected: "09:00"}
+  - {type: time, input: "subah nau baje", expected: "09:00"}
+  - {type: time, input: "shaam ko paanch baje", expected: "17:00"}
+  - {type: time, input: "शाम को पांच बजे", expected: "17:00"}
+  - {type: time, input: "raat 11 baje", expected: "23:00"}
+  - {type: time, input: "raat 12 baje", expected: "00:00"}
+  - {type: time, input: "dopahar 2 baje", expected: "14:00"}
+  - {type: time, input: "dopahar 12 baje", expected: "12:00"}
+  - {type: time, input: "saade nau baje subah", expected: "09:30"}
+  - {type: time, input: "subah saade nau baje", expected: "09:30"}
+  - {type: time, input: "sava paanch baje shaam", expected: "17:15"}
+  - {type: time, input: "paune chhe baje shaam", expected: "17:45"}
+  - {type: time, input: "dedh baje dopahar", expected: "13:30"}
+  - {type: time, input: "dhai baje dopahar", expected: "14:30"}
+  - {type: time, input: "9:30 pm", expected: "21:30"}
+  - {type: time, input: "9:30 am", expected: "09:30"}
+  - {type: time, input: "21:00", expected: "21:00"}
+  - {type: time, input: "7 am", expected: "07:00"}
+  - {type: time, input: "7 pm", expected: "19:00"}
+  - {type: time, input: "12 am", expected: "00:00"}
+  - {type: time, input: "12 pm", expected: "12:00"}
+  - {type: time, input: "9.30 baje subah", expected: "09:30"}
+  - {type: time, input: "15 baje", expected: "15:00"}
+  - {type: time, input: "सुबह छह बजे", expected: "06:00"}
+  - {type: time, input: "रात के दस बजे", expected: "22:00"}
+  - {type: time, input: "साढ़े तीन बजे दोपहर", expected: "15:30"}
+  - {type: time, input: "पौने चार बजे शाम", expected: "15:45"}
+  - {type: time, input: "सवा आठ बजे सुबह", expected: "08:15"}
+  - {type: time, input: "सुबह आठ पैंतालीस बजे", expected: "08:45"}
+  - {type: time, input: "चार बजकर तीस मिनट शाम", expected: "16:30"}
+  - {type: time, input: "चार पी. एम.", expected: "16:00"}
+  - {type: time, input: "kal subah chhe baje alarm lagao", expected: "06:00"}
+  - {type: time, input: "shaam 6 baje", expected: "18:00"}
+  - {type: time, input: "2.5 kilo cheeni", expected: none}
+  - {type: time, input: "rate 9.30 rupaye", expected: none}
+  - {type: time, input: "paanch sau rupaye", expected: none}
+  - {type: time, input: "pandrah minute", expected: none}
+  - {type: time, input: "order bhej do", expected: none}
+  - {type: date, input: "aaj", expected: "2026-10-24", ref: "2026-10-24"}
+  - {type: date, input: "kal tak bhej do", expected: "2026-10-25", ref: "2026-10-24"}
+  - {type: date, input: "parson deliver kar do", expected: "2026-10-26", ref: "2026-10-24"}
+  - {type: date, input: "maine kal gaana suna tha", expected: "2026-10-23", ref: "2026-10-24"}
+  - {type: date, input: "parson ko mila tha", expected: "2026-10-22", ref: "2026-10-24"}
+  - {type: date, input: "kal mausam kaisa rahega", expected: "2026-10-25", ref: "2026-10-24"}
+  - {type: date, input: "kal mausam kaisa tha", expected: "2026-10-23", ref: "2026-10-24"}
+  - {type: date, input: "कल सुबह छह बजे अलार्म लगाओ", expected: "2026-10-25", ref: "2026-10-24"}
+  - {type: date, input: "मैंने कल शाम को सुना था", expected: "2026-10-23", ref: "2026-10-24"}
+  - {type: date, input: "agle somvaar", expected: "2026-10-26", ref: "2026-10-24"}
+  - {type: date, input: "agle mangalvaar", expected: "2026-10-27", ref: "2026-10-24"}
+  - {type: date, input: "pichhle shukravaar", expected: "2026-10-23", ref: "2026-10-24"}
+  - {type: date, input: "pichhle somvaar", expected: "2026-10-19", ref: "2026-10-24"}
+  - {type: date, input: "shukravaar ko meeting", expected: "2026-10-30", ref: "2026-10-24"}
+  - {type: date, input: "शुक्रवार को", expected: "2026-10-30", ref: "2026-10-24"}
+  - {type: date, input: "teen din baad", expected: "2026-10-27", ref: "2026-10-24"}
+  - {type: date, input: "do hafte pehle", expected: "2026-10-10", ref: "2026-10-24"}
+  - {type: date, input: "paanch din pehle", expected: "2026-10-19", ref: "2026-10-24"}
+  - {type: date, input: "ek hafte baad", expected: "2026-10-31", ref: "2026-10-24"}
+  - {type: date, input: "2026-11-03", expected: "2026-11-03", ref: "2026-10-24"}
+  - {type: date, input: "1 November tak", expected: "2026-11-01", ref: "2026-10-24"}
+  - {type: date, input: "12 March ko", expected: "2027-03-12", ref: "2026-10-24"}
+  - {type: date, input: "बारह फरवरी", expected: "2027-02-12", ref: "2026-10-24"}
+  - {type: date, input: "15 tarikh", expected: "2026-11-15", ref: "2026-10-24"}
+  - {type: date, input: "3rd November", expected: "2026-11-03", ref: "2026-10-24"}
+  - {type: date, input: "25 December 2026", expected: "2026-12-25", ref: "2026-10-24"}
+  - {type: date, input: "kal", expected: "2026-10-25", ref: "2026-10-24", field: "delivery_date Delivery date"}
+  - {type: date, input: "kal", expected: "2026-10-23", ref: "2026-10-24", field: "to_date end of the bank statement period"}
+  - {type: date, input: "parson", expected: "2026-10-26", ref: "2026-10-24", field: "due_date"}
+  - {type: date, input: "parson", expected: "2026-10-22", ref: "2026-10-24", field: "purchase_date"}
+  - {type: date, input: "kal ki meeting", expected: "ambiguous", ref: "2026-10-24"}
+  - {type: date, input: "kal", expected: "ambiguous", ref: "2026-10-24"}
+  - {type: date, input: "parson", expected: "ambiguous", ref: "2026-10-24"}
+  - {type: date, input: "bhej do", expected: none, ref: "2026-10-24"}
+  - {type: date, input: "paanch sau rupaye", expected: none, ref: "2026-10-24"}
+  - {type: date, input: "dedh kilo", expected: none, ref: "2026-10-24"}
+  - {type: duration, input: "pandrah minute", expected: 15}
+  - {type: duration, input: "aadhe ghante", expected: 30}
+  - {type: duration, input: "dedh ghante", expected: 90}
+  - {type: duration, input: "दो घंटे", expected: 120}
+  - {type: duration, input: "आधे घंटे में", expected: 30}
+  - {type: duration, input: "saade teen ghante", expected: 210}
+  - {type: duration, input: "bees minute", expected: 20}
+  - {type: duration, input: "teen din", expected: none}

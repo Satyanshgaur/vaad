@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 import pytest
 import yaml
 
+from vaad.canon.dates import parse_date
 from vaad.canon.money import parse_amount
 from vaad.canon.numbers import find_numbers, parse_number
+from vaad.canon.times import parse_duration, parse_time
 
 CASES = yaml.safe_load((Path(__file__).parent / "canon_cases.yaml").read_text("utf-8"))["cases"]
 
@@ -28,6 +31,21 @@ def test_golden(case: dict[str, object]) -> None:
         else:
             assert got is not None, f"{text!r} found no amount"
             assert got.value == pytest.approx(case["expected"])
+        return
+    if case["type"] in ("time", "duration", "date"):
+        if case["type"] == "time":
+            got = parse_time(text)
+        elif case["type"] == "duration":
+            got = parse_duration(text)
+        else:
+            got = parse_date(text, date.fromisoformat(case["ref"]), case.get("field"))  # type: ignore[arg-type]
+        if case["expected"] in (None, "none"):
+            assert got is None, f"{text!r} should have no {case['type']}, got {got}"
+        elif case["expected"] == "ambiguous":
+            assert got is not None and got.confidence < 0.6, f"{text!r}: {got}"
+        else:
+            assert got is not None, f"{text!r} found no {case['type']}"
+            assert got.value == case["expected"], f"{text!r}: {got}"
         return
     assert case["type"] == "number", f"no golden runner for type {case['type']}"
     if "all" in case:

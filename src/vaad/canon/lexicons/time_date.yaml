@@ -1,0 +1,74 @@
+# Time, date and direction cues (Romanized Hinglish and Devanagari).
+# Provenance: written by Claude (AI assistant) from general knowledge on 2026-10-31; developed and
+# checked only against the MASSIVE hi-IN training partition (CC BY 4.0) and hand-made golden cases.
+# NOT native-reviewed. Direction cues are heuristics, not grammar: see docs/ARCHITECTURE.md.
+baje: [baje, bajke, bajey, bajkar, bajne, बजे, बजकर, बजने, बज]
+fillers: [ko, ke, mein, me, tak, se, ki, ka, को, के, में, तक, से, की, का, aaj, आज]
+periods:
+  morning: [subah, subha, savere, sabere, savera, सुबह, सवेरे, सवेरा, प्रातः]
+  afternoon: [dopahar, dupahar, dophar, दोपहर, दुपहर]
+  evening: [shaam, sham, saanjh, शाम, साँझ]
+  night: [raat, ratri, रात, रात्रि]
+minutes: [minute, minutes, min, mins, मिनट]
+hours: [ghanta, ghante, ghanta, hour, hours, hr, hrs, घंटा, घंटे, घण्टे]
+months:
+  1: [january, janwari, janvari, jan, जनवरी]
+  2: [february, farwari, farvari, feb, फरवरी, फ़रवरी]
+  3: [march, maarch, mar, मार्च]
+  4: [april, aprail, apr, अप्रैल]
+  5: [may, mai, मई]
+  6: [june, joon, jun, जून]
+  7: [july, julai, jul, जुलाई]
+  8: [august, agast, aug, अगस्त]
+  9: [september, sitambar, sep, sept, सितंबर, सितम्बर]
+  10: [october, aktubar, oct, अक्टूबर, अक्तूबर]
+  11: [november, navambar, nov, नवंबर, नवम्बर]
+  12: [december, disambar, dec, दिसंबर, दिसम्बर]
+weekdays:
+  0: [somvaar, somwar, somvar, monday, सोमवार]
+  1: [mangalvaar, mangalwar, mangalvar, tuesday, मंगलवार]
+  2: [budhvaar, budhwar, budhvar, wednesday, बुधवार]
+  3: [guruvaar, guruwar, guruvar, brihaspativaar, vrihaspativaar, thursday, गुरुवार, बृहस्पतिवार]
+  4: [shukravaar, shukrawar, shukravar, friday, शुक्रवार]
+  5: [shanivaar, shaniwar, shanivar, saturday, शनिवार]
+  6: [ravivaar, raviwar, ravivar, itvaar, itwar, sunday, रविवार, इतवार]
+# day offset from today; "direction" words are resolved by tense/field, see dates.py
+relative_days:
+  aaj: 0
+  आज: 0
+  kal: 1
+  कल: 1
+  parson: 2
+  parso: 2
+  परसों: 2
+  narson: 3
+  नरसों: 3
+next_words: [agle, agla, agli, next, आगामी, अगले, अगला, अगली]
+last_words: [pichhle, pichle, pichla, last, previous, पिछले, पिछला, पिछली, बीते]
+day_words: [din, dino, दिन]
+week_words: [hafte, haftey, hafta, saptah, हफ्ते, हफ़्ते, सप्ताह, हफ्ता]
+after_words: [baad, bad, बाद, mein, में]
+before_words: [pehle, pahle, पहले, purv]
+tarikh_words: [tarikh, tareekh, taarikh, तारीख, तारीख़, तारिख]
+# Tense cues in the clause around "kal": whole words, lower-case.
+past_cues:
+  # Plain past forms only. Resultative verbs (kiya, gaya, diya, li...) are left out on purpose: in
+  # "alarm set kiya hai" they describe setting up a future event, and in MASSIVE train they
+  # appeared only with "tomorrow".
+  [tha, thi, the, thin, hua, hui, hue, suna, suni, dekha, dekhi, aaya, aayi, aaye, mila, mili,
+   kharida, khareeda, bita, bite, beeta, था, थी, थे, थीं, हुआ, हुई, हुए, सुना, सुनी, देखा, देखी,
+   आया, आई, आए, मिला, मिली, खरीदा, बीता, बीते, बीती, बिते]
+future_cues:
+  [hoga, hogi, honge, rahega, rahegi, rahenge, karunga, karungi, karenge, karega, karegi,
+   jaunga, jaungi, jayega, jayegi, aayega, aayegi, milega, milegi, chahiye, karna, jana, bhejna,
+   lagao, lagana, lagayen, karo, kijiye, kariye, batao, bataiye, bhejo, bhejiye, dikhao,
+   dikhaiye, yaad, remind, set, book, schedule, hoga, होगा, होगी, होंगे, रहेगा, रहेगी, रहेंगे,
+   करूँगा, करूंगा, करूँगी, करूंगी, करेंगे, करेगा, करेगी, जाऊँगा, जाऊंगा, जाएगा, जाएगी, आएगा,
+   आएगी, मिलेगा, मिलेगी, चाहिए, करना, जाना, भेजना, लगाओ, लगाना, लगाएं, करो, कीजिए, कीजिये,
+   बताओ, बताइए, भेजो, भेजिए, दिखाओ, दिखाइए, याद, लगा, जोड़ें, जोड़ो, बनाओ, बुक, शेड्यूल, चलाओ,
+   खोलो, बजाओ, जगा, जगाओ, रखो, डालो]
+# Words in a tool field's name or description that fix the direction of a date.
+field_future: [deliver, delivery, due, deadline, appointment, remind, reminder, schedule, book,
+               booking, departure, depart, pickup, expiry, expire, renew, upcoming, alarm, event]
+field_past: [statement, history, transaction, purchase, purchased, ordered, previous, past,
+             spent, spending, passbook, invoice, receipt, last]

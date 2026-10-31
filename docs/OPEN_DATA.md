@@ -51,6 +51,13 @@ reading, so a "always future" baseline is wrong about one in ten), mostly calend
 (63) and weather (59) requests. Also 845 "आज" (today) and a handful of "परसों". Gold comes from the
 English text, so it is independent of anything we wrote.
 
+## First use: the times and dates evaluation
+
+`scripts/eval_massive.py` scores the time and date parsers on MASSIVE hi-IN by partition (train to
+develop, dev to check, test once). Results are in RESULTS R15: "kal" resolved correctly 97.1% of the
+time when it decides (test, 35 of 69 decided; always-tomorrow is 92.8%) and clock times 100% exact when
+confident (test, 69 of 90 confident).
+
 ## What this lets us shrink, and what it cannot
 
 - **Times and dates evaluation: use MASSIVE.** 1,073 time-slot and 2,563 date-slot utterances with

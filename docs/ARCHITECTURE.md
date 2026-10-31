@@ -122,7 +122,8 @@ The harness reads these files for per-stage analysis.
 | `server/` (app, backend, routes, pipeline, tracing) | built, gate 7 |
 | `grammar/` (tighten, validate) | built |
 | `canon/numbers.py`, `money.py`, `lexicon.py` | built (2026-10-31): number words (Roman and Devanagari), fractions, lakh/crore, `k`/`cr`, digits, rupee amounts; identifiers such as `OD4821` are never read as quantities; `find_numbers` returns spans and confidences |
-| `canon/` units, phones, dates, times | stubs, Phase 2; `decide.py` (confidence to pass/retry/flag) exists |
+| `canon/times.py`, `dates.py`, `tokens.py`, `lexicon_time.py` | built (2026-10-31): clock times with am/pm and part-of-day resolution, colloquial fractions (saade nau baje), 24-hour notation, durations; dates (today, kal/parson with tense and field direction, weekdays, day-month, N days later, tarikh); ambiguous results carry low confidence and both readings |
+| `canon/` units, phones | stubs, Phase 2; `decide.py` (confidence to pass/retry/flag) exists |
 | `router/` (langid, difficulty, policy) | stubs, Phase 3 |
 | `quants/` | Phase 3 |
 
@@ -133,9 +134,9 @@ The harness reads these files for per-stage analysis.
 | 1 | ruff lint and format | live |
 | 2 | mypy (strict on canon/, router/, grammar/) | live |
 | 3 | unit tests | live |
-| 4 | golden canonicalization cases (`tests/golden`, 155 so far) | live (numbers, money) |
-| 5 | property tests (hypothesis): spoken round trip, digits, free text untouched | live (numbers) |
-| 6 | no value invention (every output traces to a span or the reference date) | live (numbers: spans in range, ordered, idempotent) |
+| 4 | golden canonicalization cases (`tests/golden`, 237 so far) | live (numbers, money, times, dates, durations) |
+| 5 | property tests (hypothesis): spoken round trip, digits, free text untouched, time/date round trips | live (numbers, times, dates) |
+| 6 | no value invention (every output traces to a span or the reference date) | live (numbers, times, dates: spans in range, ordered, no match without date/time words) |
 | 7 | proxy contract with a mocked backend (`tests/integration`) | live |
 | 8 | latency budget (p95 < 20 ms per 1,000 canonicalizations) | Phase 2 |
 | 9 | smoke eval, 0.8B on CPU (`smoke.yml`) | live (about 5 minutes on GitHub) |
