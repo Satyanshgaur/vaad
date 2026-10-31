@@ -601,6 +601,34 @@ gateways load code at start, so the `off` control and the Qwen `annotate` run (s
 used the pre-registered parsers; the tree was then frozen at the pre-registered commit (`ef40312`) for the
 remaining modes and development moved to a separate worktree. These improvements are **not part of H9**.
 
+### R17. Held-out typed messages from new writers (2026-10-31, scored once)
+
+Data: a second private file of 196 messages from 7 **new** writers (none from the first batch), all 28
+cards, none empty. Gold from the cards as in R16. **Scored once** with the parsers frozen at `6debbae`
+(main after the typed-text fixes), aggregate output only; **no message was read**, so the file stays
+usable as a held-out check. Any parser change made after seeing this score makes it development data
+again.
+
+| Type (expected values) | Sure (>= 0.9) | Moderate (0.6-0.9) | Would ask (< 0.6) | Two readings offered | Missed | Batch 1 (development): sure / missed |
+|---|---|---|---|---|---|---|
+| Amounts (77) | 81.8% | 18.2% | 0% | 0% | **0%** | 74.1% / 4.7% |
+| Quantities (42) | 90.5% | 0% | 0% | 0% | 9.5% | 95.8% / 4.2% |
+| Dates (105) | 46.7% | 45.7% | 0% | 0% | 7.6% | 42.0% / 6.7% |
+| Clock times (42) | 78.6% | 2.4% | 7.1% | 4.8% | 7.1% | 74.5% / 8.5% |
+
+The parsers find 90-100% of the values the cards require, close to their development numbers, so the fixes
+did not simply memorize the first batch. The share of values the parser is sure about is similar or higher.
+
+**Prevalence again.** Digits appear in 94% of messages (80% in batch 1); spoken-form number words in 17 of
+196 (8.7%, batch 1: 8.9%); Devanagari script in 30% of messages (batch 1: 12%). Again it depends on the
+writer: one writer used spoken forms in 11 of 28 messages, the other six in 0, 0, 1, 1, 1 and 3. Across both
+batches (420 messages, 15 writers) spoken-form numbers are about 9% of typed messages and come mostly from
+two writers.
+
+Caveats: card-driven writing (values given as digits), 7 writers, one date and weekday, and the gold only
+covers amounts, quantities, dates and times. This says the parsers read what people type; it does not show
+that the models make fewer mistakes with them (that is H9).
+
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
 | Condition minus raw | English | Hindi | Hinglish |
