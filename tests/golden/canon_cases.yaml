@@ -1,7 +1,160 @@
-# Gate 4: fixed input -> expected canonical value. Goes live in Phase 2; target 300+ cases.
-# Every PR touching canon/ adds cases here. ref_date is 2026-10-24 unless stated.
-# - {type: number, input: "nau sau", expected: 900}
-# - {type: money, input: "5 lakh", expected: 500000}
-# - {type: date, input: "kal tak bhej do", field: delivery_date, expected: "2026-10-25"}
-# - {type: date, input: "kal", field: date, expected: flag}
-cases: []
+# Gate 4: fixed input -> expected canonical value. Target 300+ cases; every PR touching canon/ adds some.
+# Numbers: written by Claude from general knowledge 2026-10-31, NOT yet native-reviewed.
+# - {type: number, input: ..., expected: N | none}   first number in the text, or no number
+# - {type: number, input: ..., all: [N, ...]}        every number, in order
+cases:
+  - {type: number, input: "ek", expected: 1}
+  - {type: number, input: "do kilo", expected: 2}
+  - {type: number, input: "teen", expected: 3}
+  - {type: number, input: "chaar", expected: 4}
+  - {type: number, input: "paanch", expected: 5}
+  - {type: number, input: "chhe", expected: 6}
+  - {type: number, input: "saat", expected: 7}
+  - {type: number, input: "aath", expected: 8}
+  - {type: number, input: "nau", expected: 9}
+  - {type: number, input: "das", expected: 10}
+  - {type: number, input: "gyarah", expected: 11}
+  - {type: number, input: "barah", expected: 12}
+  - {type: number, input: "pandrah", expected: 15}
+  - {type: number, input: "bees", expected: 20}
+  - {type: number, input: "ikkis", expected: 21}
+  - {type: number, input: "pachchis", expected: 25}
+  - {type: number, input: "tees", expected: 30}
+  - {type: number, input: "chalis", expected: 40}
+  - {type: number, input: "pachas", expected: 50}
+  - {type: number, input: "saath rupaye", expected: 60}
+  - {type: number, input: "sattar", expected: 70}
+  - {type: number, input: "assi", expected: 80}
+  - {type: number, input: "nabbe", expected: 90}
+  - {type: number, input: "ninyanve", expected: 99}
+  - {type: number, input: "sau", expected: 100}
+  - {type: number, input: "sau rupaye", expected: 100}
+  - {type: number, input: "ek sau ek", expected: 101}
+  - {type: number, input: "do sau pachas", expected: 250}
+  - {type: number, input: "teen sau chaar", expected: 304}
+  - {type: number, input: "nau sau", expected: 900}
+  - {type: number, input: "paanch sau", expected: 500}
+  - {type: number, input: "paanch sau pachas", expected: 550}
+  - {type: number, input: "chhe sau", expected: 600}
+  - {type: number, input: "do hazaar", expected: 2000}
+  - {type: number, input: "do hazaar paanch sau", expected: 2500}
+  - {type: number, input: "pachas hazaar", expected: 50000}
+  - {type: number, input: "nau hazaar nau sau nau", expected: 9909}
+  - {type: number, input: "das hazaar", expected: 10000}
+  - {type: number, input: "teen lakh", expected: 300000}
+  - {type: number, input: "ek lakh", expected: 100000}
+  - {type: number, input: "ek lakh pachas hazaar", expected: 150000}
+  - {type: number, input: "pachas lakh", expected: 5000000}
+  - {type: number, input: "ek crore", expected: 10000000}
+  - {type: number, input: "teen crore", expected: 30000000}
+  - {type: number, input: "chaar sau saath", expected: 460}
+  - {type: number, input: "dedh sau", expected: 150}
+  - {type: number, input: "dhai sau", expected: 250}
+  - {type: number, input: "sava sau", expected: 125}
+  - {type: number, input: "saade teen sau", expected: 350}
+  - {type: number, input: "paune char sau", expected: 375}
+  - {type: number, input: "sava do hazaar", expected: 2250}
+  - {type: number, input: "paune teen hazaar", expected: 2750}
+  - {type: number, input: "saade char hazaar", expected: 4500}
+  - {type: number, input: "dedh hazaar", expected: 1500}
+  - {type: number, input: "dhai hazaar", expected: 2500}
+  - {type: number, input: "dedh lakh", expected: 150000}
+  - {type: number, input: "dhai lakh", expected: 250000}
+  - {type: number, input: "sava lakh", expected: 125000}
+  - {type: number, input: "saade teen lakh", expected: 350000}
+  - {type: number, input: "paune do lakh", expected: 175000}
+  - {type: number, input: "dedh crore", expected: 15000000}
+  - {type: number, input: "saade paanch crore", expected: 55000000}
+  - {type: number, input: "aadha", expected: 0.5}
+  - {type: number, input: "aadha kilo", expected: 0.5}
+  - {type: number, input: "dedh kilo", expected: 1.5}
+  - {type: number, input: "dhai kilo", expected: 2.5}
+  - {type: number, input: "paav", expected: 0.25}
+  - {type: number, input: "sava paanch", expected: 5.25}
+  - {type: number, input: "saade saat", expected: 7.5}
+  - {type: number, input: "paune das", expected: 9.75}
+  - {type: number, input: "5 lakh", expected: 500000}
+  - {type: number, input: "2.5 lakh", expected: 250000}
+  - {type: number, input: "1,50,000", expected: 150000}
+  - {type: number, input: "12,34,567", expected: 1234567}
+  - {type: number, input: "2.5k", expected: 2500}
+  - {type: number, input: "5k", expected: 5000}
+  - {type: number, input: "10 hazaar", expected: 10000}
+  - {type: number, input: "1.5 crore", expected: 15000000}
+  - {type: number, input: "3 sau", expected: 300}
+  - {type: number, input: "2 hazaar 5 sau", expected: 2500}
+  - {type: number, input: "500 rupaye", expected: 500}
+  - {type: number, input: "2 kilo", expected: 2}
+  - {type: number, input: "2kg cheeni", expected: 2}
+  - {type: number, input: "5L doodh", expected: 5}
+  - {type: number, input: "1500", expected: 1500}
+  - {type: number, input: "नौ सौ", expected: 900}
+  - {type: number, input: "पाँच हज़ार", expected: 5000}
+  - {type: number, input: "पांच हजार", expected: 5000}
+  - {type: number, input: "डेढ़ लाख", expected: 150000}
+  - {type: number, input: "ढाई सौ", expected: 250}
+  - {type: number, input: "साढ़े तीन सौ", expected: 350}
+  - {type: number, input: "पौने चार सौ", expected: 375}
+  - {type: number, input: "सवा सौ", expected: 125}
+  - {type: number, input: "सवा लाख", expected: 125000}
+  - {type: number, input: "आधा", expected: 0.5}
+  - {type: number, input: "पाव", expected: 0.25}
+  - {type: number, input: "पच्चीस", expected: 25}
+  - {type: number, input: "निन्यानवे", expected: 99}
+  - {type: number, input: "तीन करोड़", expected: 30000000}
+  - {type: number, input: "९५००", expected: 9500}
+  - {type: number, input: "५ लाख", expected: 500000}
+  - {type: number, input: "दो हज़ार पाँच सौ", expected: 2500}
+  - {type: number, input: "दो किलो", expected: 2}
+  - {type: number, input: "डेढ़ किलो", expected: 1.5}
+  - {type: number, input: "साठ रुपये", expected: 60}
+  - {type: number, input: "बीस", expected: 20}
+  - {type: number, input: "एक सौ पचास", expected: 150}
+  - {type: number, input: "bhej do", expected: none}
+  - {type: number, input: "order bhej do", expected: none}
+  - {type: number, input: "kar do", expected: none}
+  - {type: number, input: "mujhe de do", expected: none}
+  - {type: number, input: "payment kar do", expected: none}
+  - {type: number, input: "unke saath baat ki", expected: none}
+  - {type: number, input: "mere saath chalo", expected: none}
+  - {type: number, input: "uske saath", expected: none}
+  - {type: number, input: "भेज दो", expected: none}
+  - {type: number, input: "कर दो", expected: none}
+  - {type: number, input: "मुझे दे दो", expected: none}
+  - {type: number, input: "hello", expected: none}
+  - {type: number, input: "aaj", expected: none}
+  - {type: number, input: "kal", expected: none}
+  - {type: number, input: "U123456 ke mandates", expected: none}
+  - {type: number, input: "OD4821", expected: none}
+  - {type: number, input: "order ABC12", expected: none}
+  - {type: number, input: "mera parcel PQ77 parson tak bhej do, 3 kilo ka hai", expected: 3}
+  - {type: number, input: "saath hazaar rupaye bhej do", expected: 60000}
+  - {type: number, input: "do din baad", expected: 2}
+  - {type: number, input: "teen din baad", expected: 3}
+  - {type: number, input: "ek order", expected: 1}
+  - {type: number, input: "teen chaar din", all: [3, 4]}
+  - {type: number, input: "do kilo cheeni aur teen kilo chawal", all: [2, 3]}
+  - {type: number, input: "paanch sau rupaye aur ek hazaar", all: [500, 1000]}
+  - {type: number, input: "5 lakh ka loan 36 mahine ke liye", all: [500000, 36]}
+  - {type: money, input: "paanch sau rupaye", expected: 500}
+  - {type: money, input: "Rs 5,000", expected: 5000}
+  - {type: money, input: "Rs. 750", expected: 750}
+  - {type: money, input: "₹2.5 lakh", expected: 250000}
+  - {type: money, input: "₹500", expected: 500}
+  - {type: money, input: "dedh lakh rupaye", expected: 150000}
+  - {type: money, input: "saade teen sau rupaye", expected: 350}
+  - {type: money, input: "2 kilo aur 500 rupaye", expected: 500}
+  - {type: money, input: "50 paise", expected: 0.5}
+  - {type: money, input: "5 lakh rupees", expected: 500000}
+  - {type: money, input: "1,50,000 INR", expected: 150000}
+  - {type: money, input: "ढाई करोड़ रुपये", expected: 25000000}
+  - {type: money, input: "डेढ़ हज़ार रुपए", expected: 1500}
+  - {type: money, input: "पाँच सौ रुपये", expected: 500}
+  - {type: money, input: "sau rupaye bhej do", expected: 100}
+  - {type: money, input: "do hazaar rupaye de do", expected: 2000}
+  - {type: money, input: "tees hazaar rs", expected: 30000}
+  - {type: money, input: "rs 1.5 crore", expected: 15000000}
+  - {type: money, input: "2 kilo cheeni", expected: none}
+  - {type: money, input: "teen din baad", expected: none}
+  - {type: money, input: "order bhej do", expected: none}
+  - {type: money, input: "dedh lakh", field_is_amount: true, expected: 150000}

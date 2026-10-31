@@ -1,0 +1,3 @@
+file,speaker_id,part,scenario_id,written_message_id,recorded_on,device,environment,intended_values
+spk01_A001.wav,spk01,A,S03,,2026-11-02,Redmi Note 12,quiet,weight_kg=1.5; delivery_date=2026-11-04
+spk01_B001.wav,spk01,B,,T017,2026-11-02,Redmi Note 12,quiet,

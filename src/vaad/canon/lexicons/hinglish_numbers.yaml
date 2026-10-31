@@ -1,30 +1,251 @@
-# Seed list written during scaffolding; needs native-speaker review before Phase 2 relies on it.
-# Ambiguity: "do" is also the verb "give" ("bhej do"); the parser must use context, not lookup.
+# Romanized Hindi number words (Hinglish chat spelling).
+# Provenance: written by Claude (AI assistant) from general knowledge on 2026-10-31. NOT yet
+# reviewed by a native speaker; spelling variants and the verb/number cues below need review.
+# Rules: one surface form per key, lower-case; variants are listed separately.
 units:
+  shunya: 0
+  zero: 0
   ek: 1
   do: 2
+  doh: 2
   teen: 3
+  tin: 3
   char: 4
   chaar: 4
   paanch: 5
   panch: 5
+  paach: 5
+  pach: 5
   chhe: 6
   che: 6
+  chhah: 6
+  chhai: 6
   saat: 7
   aath: 8
   nau: 9
   das: 10
+  gyarah: 11
+  barah: 12
+  terah: 13
+  chaudah: 14
+  pandrah: 15
+  solah: 16
+  satrah: 17
+  atharah: 18
+  unnis: 19
+  bees: 20
+  bis: 20
+  ikkis: 21
+  baais: 22
+  bais: 22
+  teis: 23
+  chaubis: 24
+  pachchis: 25
+  pachis: 25
+  pachees: 25
+  chhabbis: 26
+  sattaais: 27
+  sattais: 27
+  atthaais: 28
+  atthais: 28
+  unatees: 29
+  untis: 29
+  tees: 30
+  tis: 30
+  ikatees: 31
+  battis: 32
+  battees: 32
+  taintees: 33
+  chauntees: 34
+  paintees: 35
+  chhattis: 36
+  chhatees: 36
+  saintees: 37
+  adtees: 38
+  untalis: 39
+  chalis: 40
+  chaalis: 40
+  iktalis: 41
+  bayalis: 42
+  taitalis: 43
+  chauvalis: 44
+  paintalis: 45
+  chhiyalis: 46
+  saintalis: 47
+  adtalis: 48
+  unanchas: 49
+  pachas: 50
+  pachaas: 50
+  ikyavan: 51
+  bavan: 52
+  tirpan: 53
+  chauvan: 54
+  pachpan: 55
+  chhappan: 56
+  sattavan: 57
+  atthavan: 58
+  unsath: 59
+  # "saath" (60) is also "with": handled by context, see ambiguous_units.
+  saath: 60
+  sath: 60
+  iksath: 61
+  baasath: 62
+  tirsath: 63
+  chausath: 64
+  painsath: 65
+  chhiyasath: 66
+  sadsath: 67
+  adsath: 68
+  unhattar: 69
+  sattar: 70
+  ikhattar: 71
+  bahattar: 72
+  tihattar: 73
+  chauhattar: 74
+  pachhattar: 75
+  chhihattar: 76
+  satattar: 77
+  athattar: 78
+  unaasi: 79
+  assi: 80
+  ikyasi: 81
+  bayasi: 82
+  tirasi: 83
+  chaurasi: 84
+  pachasi: 85
+  chhiyasi: 86
+  sattasi: 87
+  atthasi: 88
+  nawasi: 89
+  nabbe: 90
+  ikyanve: 91
+  baanve: 92
+  tiranve: 93
+  chauranve: 94
+  pachanve: 95
+  chhiyanve: 96
+  sattanve: 97
+  atthanve: 98
+  ninyanve: 99
 multipliers:
   sau: 100
   hazaar: 1000
   hazar: 1000
+  hajar: 1000
   lakh: 100000
   lac: 100000
+  lakhs: 100000
   crore: 10000000
   karod: 10000000
+  cr: 10000000
+  arab: 1000000000
 fractions:
   aadha: 0.5
   adha: 0.5
+  aadhi: 0.5
   dedh: 1.5
+  derh: 1.5
   dhai: 2.5
   dhaai: 2.5
+  dhaii: 2.5
+  paav: 0.25
+  pav: 0.25
+# sava X = X + 0.25, saade X = X + 0.5, paune X = X - 0.25
+modifiers:
+  sava: 0.25
+  sawa: 0.25
+  saade: 0.5
+  sade: 0.5
+  saadhe: 0.5
+  paune: -0.25
+# Words that, directly before "do", make it the verb "give" (bhej do, kar do), not the number 2.
+verb_stems:
+  - bhej
+  - bhejo
+  - kar
+  - karo
+  - de
+  - dedo
+  - rakh
+  - rakho
+  - daal
+  - dal
+  - bata
+  - batao
+  - laga
+  - lagao
+  - chala
+  - chalao
+  - bana
+  - banao
+  - hata
+  - hatao
+  - kholo
+  - band
+  - mangwa
+  - mangwao
+  - nikal
+  - nikalo
+  - bol
+  - bolo
+  - dikha
+  - dikhao
+  - la
+  - lao
+  - pay
+  - transfer
+  - cancel
+  - book
+  - add
+  - delete
+  - jama
+# Words after which a bare ambiguous number word ("do", "saath") is read as a number.
+number_followers:
+  - sau
+  - hazaar
+  - hazar
+  - lakh
+  - lac
+  - crore
+  - karod
+  - kilo
+  - kg
+  - kilogram
+  - gram
+  - gm
+  - litre
+  - liter
+  - ltr
+  - rupaye
+  - rupees
+  - rupiye
+  - rs
+  - rupaya
+  - paise
+  - din
+  - hafte
+  - mahine
+  - mahina
+  - saal
+  - ghante
+  - ghanta
+  - minute
+  - baje
+  - bajke
+  - log
+  - logon
+  - piece
+  - pieces
+  - packet
+  - packets
+  - dozen
+  - meter
+  - km
+  - percent
+  - tarikh
+ambiguous_units:
+  - do
+  - doh
+  - saath
+  - sath
+  - ek
