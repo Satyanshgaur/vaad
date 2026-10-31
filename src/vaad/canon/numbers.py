@@ -19,6 +19,7 @@ from vaad.types import Canonicalized, Span
 
 _CONJUNCTIONS = frozenset({"aur", "ya", "to", "phir", "bas", "na", "please", "plz", "ji", "hai"})
 _SUFFIXES = {"k": 1000, "cr": 10_000_000}
+_EN_TENS = frozenset({"twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"})
 # Letters that may touch a digit and still leave it a quantity ("2kg", "5L", "9pm"); any other
 # letters touching a digit make it part of an identifier ("OD4821", "U123456").
 _UNIT_SUFFIXES = frozenset(
@@ -82,6 +83,7 @@ class _Phrase:
         self.confidence = 1.0
         self.notes: list[str] = []
         self.parsed_any = False
+        self.after_tens = False  # "seventy" just read: a unit 1-9 may follow ("seventy five")
         self.snapshot: tuple[Fraction, bool] = (Fraction(0), False)
 
     # --- context checks for words that are numbers only sometimes -----------------------
@@ -194,6 +196,11 @@ class _Phrase:
                 self._accept(self.pos + 1, "unit")
                 continue
             if word in lex.units:
+                if self.after_tens and 1 <= lex.units[word] <= 9 and word.isascii():
+                    self.cur += lex.units[word]
+                    self.after_tens = False
+                    self._accept(self.pos + 1, "unit")
+                    continue
                 if self.last not in ("start", "mult"):
                     break
                 ok, conf, note = self._is_number_here(self.pos)
@@ -204,6 +211,7 @@ class _Phrase:
                 coefficient_start = self._mark()
                 self.cur += lex.units[word]
                 self.have_cur = True
+                self.after_tens = word in _EN_TENS
                 self.confidence = min(self.confidence, conf)
                 if note:
                     self.notes.append(note)

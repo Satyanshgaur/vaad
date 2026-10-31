@@ -557,6 +557,50 @@ weekday, "agle ...", day-and-month, N days later); the rest are week and month p
 **Tests:** 394 pass (237 golden cases, hypothesis properties for round trips, am/pm, period words,
 offsets, weekdays, tense-cue direction, spans).
 
+### R16. Human-typed messages: how common are spoken forms, and do the parsers cope? (2026-10-31)
+
+Data: a private file of 224 messages (8 writers x 28 scenario cards, `docs/templates/scenario_cards.md`),
+written 2026-10-31 as the writer would type to a WhatsApp bot. Only aggregates are published: no message
+text and no per-person results. Gold comes from the cards, not from the writers (each card fixes the
+amounts, weights, times and dates). `scripts/eval_typed.py`.
+
+**Prevalence (what people actually type).** 80% of messages contain digits; 11% contain no number at all;
+spoken-form number words (fractions such as dedh and sava, plain number words, "sau/hazaar" words) appear in
+**20 of 224 (8.9%)**. "5 lakh", "1.5 crore", "12 hazaar" are written as digits plus the word. It is
+**highly writer-dependent**: one writer (who mixes Devanagari and Roman) used them in 12 of 28 messages; the
+other seven in 0, 0, 0, 1, 1, 2 and 4 of 28. This matches the open-data counts (OPEN_DATA.md): in typed Roman
+Hinglish, digits dominate.
+
+**Parsers against the cards (development numbers; see the caveat).** First pass, then after fixing the gaps
+the messages exposed (English date words "tomorrow / tonight / yesterday / day after tomorrow", "this
+Friday", bare ordinals "28th" and "3rd ko", "half litre", English number words "three hundred seventy
+five", "5L" as 5 lakh, "1 Oct" resolving to the nearest year, and a sole number in an amount field counting
+as strong evidence). Share of the values the cards require that the parser found:
+
+| Type (expected values) | First pass: found | After the fixes: sure (>= 0.9) | moderate (0.6-0.9) | would ask (< 0.6) | missed |
+|---|---|---|---|---|---|
+| Amounts (85) | 95% (25% sure) | 74.1% | 21.2% | 0% | 4.7% |
+| Quantities (48) | 87.5% | 95.8% | 0% | 0% | 4.2% |
+| Dates (119) | 65.5% | 42.0% | 51.3% | 0% | 6.7% |
+| Clock times (47) | 91.5% | 74.5% | 2.1% | 8.5% (+6.4% two readings offered) | 8.5% |
+
+"Moderate" means the parser is right but only at 0.6-0.9 (typically "kal"/"parso" fixed by the field alone,
+or a day of the month with an assumed month): a wrong value would trigger a guided retry, a correct one
+passes. Dates never reach the asking tier here because the field hints (delivery, due, statement) fix the
+direction; **without a field, "kal"/"parso" ask** (R15). Clock times are the only type that asks (a bare
+"paanch baje" is AM or PM). Confident-but-not-on-the-card outputs: 3 amounts, 2 dates (10 quantities are
+packets and similar that the cards do not list).
+
+**Caveats.** (1) I read this data's misses to fix the parsers, so these are **development numbers, not a
+held-out result**; a fresh batch from new writers is still needed. (2) Writers saw cards that give values as
+digits, which may push them toward digits. (3) Some writers had also reviewed the value-heavy set, so this is
+not a fully naive pool. (4) All dates assume the message date 2026-10-31 (a Saturday).
+
+**Process note.** The H9 experiment was running from the same working tree while I changed the parsers. Its
+gateways load code at start, so the `off` control and the Qwen `annotate` run (started 14:14 and 14:28)
+used the pre-registered parsers; the tree was then frozen at the pre-registered commit (`ef40312`) for the
+remaining modes and development moved to a separate worktree. These improvements are **not part of H9**.
+
 ### Gateway (grammar + retry) vs raw, Qwen3.5-4B, paired pass^4 (exploratory)
 
 | Condition minus raw | English | Hindi | Hinglish |

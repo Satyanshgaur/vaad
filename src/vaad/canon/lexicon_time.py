@@ -22,6 +22,8 @@ class TimeDateLexicon:
     months: dict[str, int]
     weekdays: dict[str, int]  # Monday = 0
     relative_days: dict[str, int]
+    fixed_days: dict[str, int]
+    this_words: frozenset[str]
     next_words: frozenset[str]
     last_words: frozenset[str]
     day_words: frozenset[str]
@@ -58,6 +60,8 @@ def time_date_lexicon() -> TimeDateLexicon:
         months=months,
         weekdays=weekdays,
         relative_days={_nfc(k): int(v) for k, v in data["relative_days"].items()},
+        fixed_days={_nfc(k): int(v) for k, v in data["fixed_days"].items()},
+        this_words=_set(data, "this_words"),
         next_words=_set(data, "next_words"),
         last_words=_set(data, "last_words"),
         day_words=_set(data, "day_words"),

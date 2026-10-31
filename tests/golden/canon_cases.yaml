@@ -242,3 +242,23 @@ cases:
   - {type: duration, input: "saade teen ghante", expected: 210}
   - {type: duration, input: "bees minute", expected: 20}
   - {type: duration, input: "teen din", expected: none}
+  - {type: date, input: "tomorrow", expected: "2026-10-25", ref: "2026-10-24"}
+  - {type: date, input: "yesterday", expected: "2026-10-23", ref: "2026-10-24"}
+  - {type: date, input: "tonight", expected: "2026-10-24", ref: "2026-10-24"}
+  - {type: date, input: "today", expected: "2026-10-24", ref: "2026-10-24"}
+  - {type: date, input: "day after tomorrow", expected: "2026-10-26", ref: "2026-10-24"}
+  - {type: date, input: "day before yesterday", expected: "2026-10-22", ref: "2026-10-24"}
+  - {type: date, input: "this Friday", expected: "2026-10-30", ref: "2026-10-24"}
+  - {type: date, input: "this Wednesday", expected: "2026-10-28", ref: "2026-10-24"}
+  - {type: date, input: "28th", expected: "2026-10-28", ref: "2026-10-24"}
+  - {type: date, input: "3rd ko", expected: "2026-11-03", ref: "2026-10-24"}
+  - {type: date, input: "1 Oct se", expected: "2026-10-01", ref: "2026-10-24"}
+  - {type: date, input: "28th", expected: "2026-11-28", ref: "2026-10-30"}
+  - {type: quantity, input: "half litre milk", expected: {value: 0.5, unit: l}}
+  - {type: number, input: "three hundred seventy five", expected: 375}
+  - {type: number, input: "seventy five thousand", expected: 75000}
+  - {type: number, input: "twenty one", expected: 21}
+  - {type: number, input: "two lakh", expected: 200000}
+  - {type: money, input: "5L loan chahiye", expected: 500000, field_is_amount: true}
+  - {type: money, input: "1.5L transfer karna hai", expected: 150000, field_is_amount: true}
+  - {type: number, input: "five thirty", all: [5, 30]}
