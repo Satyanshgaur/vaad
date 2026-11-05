@@ -58,6 +58,7 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 
 [tool.ruff.lint.per-file-ignores]
 "harness/importers/typed.py" = ["E501"]  # long scenario tables
+"scripts/analyze_phase4.py" = ["E501"]  # table print lines
 
 [tool.ruff.lint.isort]
 known-first-party = ["vaad", "harness"]
