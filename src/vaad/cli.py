@@ -17,7 +17,20 @@ def main(argv: list[str] | None = None) -> int:
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
 
+    gaps = sub.add_parser("gaps", help="list unknown words before time/money/quantity anchors")
+    gaps.add_argument("csv")
+    gaps.add_argument("--column", default="text")
+    gaps.add_argument("--min-count", type=int, default=3)
+
     args = parser.parse_args(argv)
+    if args.command == "gaps":
+        import json
+
+        from vaad.canon.gaps import mine, read_column
+
+        report = mine(read_column(args.csv, args.column), args.min_count)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return 0
     if args.command == "serve":
         import uvicorn
 

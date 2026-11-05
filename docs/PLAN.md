@@ -351,3 +351,10 @@ models above 4B; quants below Q3.
 - [x] Who are the native-speaker reviewers? Two for the data (names in `checked_by`); more are
       needed for the lexicons and for inter-annotator agreement
 - [ ] Which strong tier for the demo?
+
+
+## Audio is v2 (decided 2026-11-05)
+
+Recordings are hard to arrange, so voice evaluation moves to v2. The requirements are written in
+[AUDIO_SPEC.md](AUDIO_SPEC.md). Until then the product is claimed for text only (typed chat and ASR
+transcripts are untested), and every voice statement in the docs stays an open question.
