@@ -92,6 +92,7 @@ def test_phone_numbers_are_masked_in_the_audit_helper() -> None:
 
 @pytest.mark.unit
 def test_canon_version_changes_with_the_lexicons() -> None:
+    from vaad import __version__
     from vaad.canon.version import canon_version
 
-    assert canon_version().startswith("0.") and "+lex." in canon_version()
+    assert canon_version().startswith(__version__ + "+lex.")
