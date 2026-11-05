@@ -1,22 +1,31 @@
 # vaad
 
-An open-source, OpenAI-compatible gateway that makes small local models produce correct tool
-calls from Hindi and Hinglish requests.
+A deterministic layer that grounds Hindi and Hinglish spoken values for small local models: numbers
+("dedh hazaar" = 1500), money (lakh, crore), quantities, clock times ("saade aath baje"), durations,
+phone numbers and relative dates ("kal" resolved from tense and the field). It gives each value a span and a
+calibrated confidence, and **asks instead of guessing** when the text is ambiguous (AM or PM, an unmarked
+"kal"). It can run as a library or as an OpenAI-compatible gateway in front of `llama-server`.
 
-> User: *mera order kal tak bhej do, 2 kilo wala*
-> Without vaad: `{"date": "kal"}` · With vaad: `{"date": "2026-10-25", "weight_kg": 2}`
+```python
+from datetime import date
+from vaad.canon import annotate_turn
 
-vaad sits between your agent and `llama-server` (or any OpenAI-compatible backend). It routes
-each turn to a small or strong model, tightens tool schemas, validates the arguments that come
-back, and canonicalizes Hinglish values (numbers, lakh/crore, relative dates, times, phones,
-units) into the format each tool expects. An uncertain value is never silently executed: it is
-retried once or returned to the user as a question.
+annotate_turn("mera order kal tak bhej do, dedh hazaar rupaye", date(2026, 10, 24))
+# 'mera order kal [=2026-10-25] tak bhej do, dedh hazaar [=1500] rupaye'
+```
 
-**Status:** pre-alpha, Phase 1 (proxy and grammar layer done; the canonicalizer is Phase 2).
-The gateway is a working OpenAI-compatible proxy with schema tightening, validation, one
-guided retry and a clarification flag, but it does not normalize Hinglish values yet. The
-baseline and the datasets are in. See [docs/](docs/README.md) for the plan, results, methods,
-data, architecture and decisions.
+**What is measured** (details and caveats in [docs/RESULTS.md](docs/RESULTS.md), calibration in
+[docs/CALIBRATION.md](docs/CALIBRATION.md)):
+
+- On 189 held-out human-typed tool-calling tasks, the normalizer raised pass^4 by 16 to 22 points on three
+  small models (all intervals above 0) and cut wrong values from 23-42% to 7-9% with `canon.mode: both`.
+- Outputs the parser is at least 90% sure of were right 97-100% of the time on held-out data.
+- These tasks were written to contain values. In real chat such values are rare, and spoken input through
+  ASR is **not tested yet** (planned for v2, see [docs/AUDIO_SPEC.md](docs/AUDIO_SPEC.md)).
+- Lexicons are AI-written and not yet native-reviewed.
+
+**Status:** pre-alpha. See [docs/](docs/README.md) for the plan, results, methods, data, architecture and
+decisions.
 
 ## Development
 
