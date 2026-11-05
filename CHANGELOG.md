@@ -5,6 +5,8 @@ All notable changes to this project are documented here. Versions follow SemVer.
 ## [Unreleased]
 
 ### Added
+- `vaad parse "<text>"`: every value found, with confidence and reason; `vaad gaps`: lexicon gap miner.
+- Audit trail (`canon_args`, `canon_version`), calibration card, `canon.mode` off/annotate/verify/both.
 - Phase 2: `canon` times, dates, durations (tense- and field-aware "kal"), evaluated on MASSIVE hi-IN.
 - Open-data survey, prevalence counts and the collection protocol (docs/OPEN_DATA.md, DATA_COLLECTION.md).
 - Phase 0: BFCL-Hi/BFCL paired tasks, 140 Hinglish rewrites, the 50-scenario value-heavy set
