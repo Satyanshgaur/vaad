@@ -323,3 +323,30 @@ sits only on that subset, that is the honest size of the product's value on type
 **A6 outcome (2026-10-31, RESULTS R20):** helps on 3 of 3 models (annotate - off: +22.2, +19.0, +16.4 pass^4
 points, all CIs above 0). The expectation of "no detectable effect" was wrong; the gain is mostly dates and times,
 not spoken numbers. Subset analysis not run. Caveats in R20.
+
+
+### A7 (2026-11-05, before any test-split run): the one test run (Phase 4)
+
+**What is run, once.** Test split (`harness/tasks/test`, never run before): value-heavy (81), BFCL English
+(87), BFCL Hinglish (83); BFCL Hindi is not run. Models Qwen3.5-4B, Granite-4.0-micro, Ministral-3-3B, Q4_K_M,
+4 seeds, temperature 0.7, reference date 2026-10-24, through the gateway with grammar tightening **off** and the
+guided retry **on**, as in H9/H10. Arms: `canon.mode` = `off`, `annotate`, `both` on all three models; on Qwen
+also `worked` (the worked-conversion prompt, direct to the model). Parsers, lexicons and thresholds are those of
+`main` at the commit recorded in the results; **nothing is changed after the first test task runs.** Statistic:
+per-task pass^4, paired bootstrap 95% CI over tasks of (arm minus `off`).
+
+**Rules, fixed now.**
+- **T1 (replicates H9/H10 on test).** On value-heavy, `annotate` minus `off` has CI above 0 on >= 2 of 3 models.
+- **T2 (English regression).** On BFCL English, the CI lower bound of (mode minus `off`) is >= -3 points. Reported
+  per mode and per model. H9 failed this for `both` on dev (lower bounds -8 to -11); I expect it to fail again
+  for `both` and to hold, or nearly, for `annotate`. Not met = reported as not met.
+- **T3 (the launch target, Qwen only, mode `both`).** On Hinglish tasks (BFCL Hinglish plus the Hinglish tasks of
+  value-heavy, pooled), pass^4 of `both` minus the better of (`off`, `worked`) is >= +10 points with CI above 0;
+  the Hinglish wrong-value rate of `both` is below `off`'s with the paired CI of the change below 0; English
+  as in T2. The original target was written 2026-10-24 for the whole gateway, which has since been narrowed to
+  the normalizer, so T3 tests the normalizer against that target; the router and grammar are not part of it.
+- **T4 (latency).** Added canonicalizer time per request, p50 < 20 ms (microbenchmark on the CPU).
+
+**Reported either way,** with the dev numbers beside them: pass^4, wrong-value rate, flag rate, per set. No
+arm or threshold is added, dropped or tuned after seeing a test result. If a run fails for infrastructure
+reasons it is resumed with the same settings (`--resume`), as before.
