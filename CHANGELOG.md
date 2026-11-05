@@ -4,6 +4,10 @@ All notable changes to this project are documented here. Versions follow SemVer.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-05
+
+First release: see docs/RELEASE_NOTES.md. Text only; audio is planned for v2.
+
 ### Added
 - `vaad parse "<text>"`: every value found, with confidence and reason; `vaad gaps`: lexicon gap miner.
 - Audit trail (`canon_args`, `canon_version`), calibration card, `canon.mode` off/annotate/verify/both.
