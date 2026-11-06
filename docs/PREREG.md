@@ -350,3 +350,7 @@ per-task pass^4, paired bootstrap 95% CI over tasks of (arm minus `off`).
 **Reported either way,** with the dev numbers beside them: pass^4, wrong-value rate, flag rate, per set. No
 arm or threshold is added, dropped or tuned after seeing a test result. If a run fails for infrastructure
 reasons it is resumed with the same settings (`--resume`), as before.
+
+
+**A7 outcome (2026-11-06, RESULTS R21):** T1 met (3 of 3 models), T2 not met (English lower bounds -6.9 to
+-12.6 against -3), T3 not met (+7.3 [-1.8, +15.5] against +10; the wrong-value clause held), T4 met (0.14 ms).

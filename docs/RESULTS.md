@@ -726,3 +726,48 @@ How far to read it:
   wrong values to 7-9% on all three, at the cost of flags. Which mode to ship is an application choice (ask vs
   guess), not a result.
 - Not yet measured: spoken input through ASR, which is the product's actual premise.
+
+
+## R21. The one test-split run (A7, 2026-11-06)
+
+Test split, 251 tasks (value-heavy 81, BFCL English 87, BFCL Hinglish 83), three models, Q4_K_M, 4 seeds,
+temperature 0.7, gateway with grammar off and retry on, parsers frozen at `beb6aa8`. Paired pass^4 against `off`,
+points, 95% CI over tasks.
+
+| Set | Arm | Qwen3.5-4B | Granite-4.0-micro | Ministral-3-3B |
+|---|---|---|---|---|
+| value-heavy (81) | annotate | +21.0 [+12.3, +30.9] | +28.4 [+18.5, +38.3] | +16.0 [+7.4, +25.9] |
+| value-heavy (81) | both | +24.7 [+14.8, +35.8] | +44.4 [+33.3, +55.6] | +17.3 [+8.6, +27.2] |
+| value-heavy Hinglish (27) | annotate | +37.0 [+18.5, +55.6] | +40.7 [+22.2, +59.3] | +37.0 [+18.5, +55.6] |
+| value-heavy Hinglish (27) | both | +44.4 [+25.9, +63.0] | +59.3 [+40.7, +77.8] | +40.7 [+22.2, +59.3] |
+| BFCL English (87) | annotate | -3.4 [-9.2, +1.1] | -3.4 [-8.0, +0.0] | +0.0 [-6.9, +6.9] |
+| BFCL English (87) | both | -5.7 [-12.6, +1.1] | -5.7 [-11.5, +0.0] | +0.0 [-6.9, +6.9] |
+| BFCL Hinglish (83) | annotate | -3.6 [-9.6, +1.2] | +0.0 [-3.6, +3.6] | +2.4 [-2.4, +7.2] |
+| BFCL Hinglish (83) | both | -3.6 [-9.6, +2.4] | +1.2 [-2.4, +4.8] | +0.0 [-4.8, +4.8] |
+| Hinglish pooled (110) | annotate | +6.4 [+0.0, +13.6] | +10.0 [+4.5, +16.4] | +10.9 [+4.5, +17.3] |
+| Hinglish pooled (110) | both | +8.2 [+0.0, +16.4] | +15.5 [+8.2, +22.7] | +10.0 [+3.6, +17.3] |
+
+Qwen worked-conversion prompt minus `off`: value-heavy +6.2 [-1.2, +13.6], BFCL English +4.6 [-4.6, +12.6],
+Hinglish pooled +0.9 [-7.3, +9.1] (no effect distinguishable from zero).
+Overall wrong-value rate off / annotate / both: Qwen 18.0 / 14.3 / 13.8%, Granite 33.2 / 25.9 / 19.2%,
+Ministral 27.5 / 19.3 / 13.0%; flag rate of `both` 6.1 / 8.7 / 13.0%. Added canonicalizer time: p50 0.14 ms,
+p95 0.23 ms (dev turns, CPU).
+
+**Verdicts against the A7 rules**
+- **T1 met.** `annotate` raises value-heavy pass^4 with the CI above 0 on 3 of 3 models (replicates H9/H10 on
+  the untouched test split).
+- **T2 not met.** On BFCL English the lower bounds are -9.2, -8.0, -6.9 (`annotate`) and -12.6, -11.5, -6.9
+  (`both`), all below -3. The point estimates are small (0 to -5.7) and every interval includes 0 or touches it, so
+  87 tasks cannot exclude a loss of several points, but the pre-registered clause is not satisfied. My A7
+  expectation that `annotate` would hold or nearly hold was wrong. Ministral's estimate is exactly 0.
+- **T3 not met.** Qwen, Hinglish pooled, `both` minus the better of (`off` 52.7, `worked` 53.6) is +7.3
+  [-1.8, +15.5]: short of +10 and the CI includes 0. The wrong-value clause holds (21.4% to 14.3%, change -7.0
+  [-13.6, -0.5]). The English clause fails as in T2.
+- **T4 met.** 0.14 ms p50, far below 20 ms.
+
+**What this means.** The normalizer clearly helps where messages carry spoken values (value-heavy Hinglish +37 to
++59 points) and wrong values fall on every model. On natural Hinglish BFCL text, which has few spoken values, it
+does nothing detectable, and on English it may cost a few points, which a larger English set would be needed
+to bound. The launch target of +10 points on pooled Hinglish was not met for Qwen because pooled Hinglish is mostly
+BFCL text where there is little to fix. The worked prompt alone does not help here. One system suspend occurred
+during the run; the runner resumed and all ten arms have 1004 trials.

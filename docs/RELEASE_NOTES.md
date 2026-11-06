@@ -18,7 +18,10 @@ OpenAI-compatible gateway. **Text only.** Audio is v2.
 - Held-out human-typed tool-calling tasks (189, three small models): pass^4 +16 to +22 points with the
   normalizer, wrong values 23-42% to 7-9% when it may ask.
 - Outputs the parser was at least 90% sure of were right 97-100% of the time on held-out data.
-- Pre-registered test-split run: TEST_RESULTS_PLACEHOLDER
+- Pre-registered test-split run: on the untouched test split the normalizer raised value-heavy pass^4
+  by +16 to +44 points on all three models (CIs above 0; value-heavy Hinglish +37 to +59 with `both`). Two
+  pre-registered targets were **not** met: English accuracy may drop by up to a few points (CI lower bounds -7 to
+  -13), and pooled Hinglish gain for Qwen was +7.3 [-1.8, +15.5] against the +10 target. See RESULTS R21.
 
 ## Known limits (read these)
 
