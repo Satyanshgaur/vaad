@@ -1,7 +1,6 @@
 # Draft: spoken-value grounding for small local models in Hindi/Hinglish
 
-Working draft, 2026-11-05. Numbers come from `docs/RESULTS.md` (R-numbers in brackets). Items marked **[T]** wait
-for the pre-registered test run (PREREG A7) and are not claims yet. This is a preprint skeleton, not a
+Working draft, 2026-11-05. Numbers come from `docs/RESULTS.md` (R-numbers in brackets). Items marked (test run done, R21) This is a preprint skeleton, not a
 submission. Authors, acknowledgements and the dataset release are the author's decisions.
 
 ## Abstract (draft)
@@ -65,7 +64,10 @@ costs about nothing [R11, R14].
   -8.1) [R19]. Dev is circular (same author as the lexicons).
 - Held-out human-typed (189 tasks, new writers): annotate - off +22.2 [16.4, 28.6], +19.0, +16.4; both - off
   +21.7, +28.0, +11.6; wrong values 23/42/34% -> 7/9/7% with `both` at the price of a 7-19% ask rate [R20].
-- **[T] Test split** (value-heavy, BFCL English and Hinglish): table to be inserted from A7.
+- **Test split (A7, R21):** value-heavy annotate - off +21.0 / +28.4 / +16.0 (all CIs above 0), `both`
+  +24.7 / +44.4 / +17.3; value-heavy Hinglish +37 to +59. BFCL English -3.4 / -3.4 / 0.0 (annotate), -5.7 / -5.7 /
+  0.0 (both), lower bounds -6.9 to -12.6: the English clause fails. Pooled Hinglish for Qwen `both` vs best
+  baseline +7.3 [-1.8, +15.5]: the +10 launch target is not met. Worked prompt: no detectable effect.
 
 ### 4.4 Parsers and calibration [R15-R17, CALIBRATION.md]
 MASSIVE hi-IN (test, run once): "kal" direction 97.1% when decided (34/35; baseline 92.8%), clock times 100%
